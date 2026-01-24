@@ -3,16 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
 
 const navLinks = [
     { label: "Accueil", href: "#accueil" },
     { label: "Qui sommes-nous", href: "#qui-sommes-nous" },
     { label: "Comment ça marche", href: "#comment-ca-marche" },
     { label: "Simulation", href: "#simulation" },
+    { label: "FAQ", href: "#faq" },
 ];
 
 export default function HeaderSection() {
@@ -36,9 +36,9 @@ export default function HeaderSection() {
                             priority
                         />
                     </div>
-                    <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent hidden sm:inline">
-                        FlashRend
-                    </span>
+                    <h1 className="text-xl font-bold font-mono hidden sm:inline">
+                        <span className="text-primary">Flash</span>Rend
+                    </h1>
                 </Link>
 
                 {/* Desktop Navigation */}
@@ -53,18 +53,22 @@ export default function HeaderSection() {
                             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
                         </Link>
                     ))}
-                    <a
-                        href="/#contact"
+                    <Link
+                        href="/contact"
                         className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
                     >
                         Contact
-                    </a>
+                    </Link>
                 </div>
 
                 {/* CTA and Mobile Menu */}
                 <div className="flex items-center gap-4">
-                    <Link href="/login">
-                        <Button variant="default" size="sm">
+                    <Link href="/login" className="hover:cursor-pointer">
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="hover:cursor-pointer"
+                        >
                             Se connecter
                         </Button>
                     </Link>
@@ -81,11 +85,8 @@ export default function HeaderSection() {
                                 <Menu className="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent
-                            side="right"
-                            className="w-64 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md"
-                        >
-                            <div className="flex flex-col gap-6 mt-8">
+                        <SheetContent side="right" className="w-64 bg-black">
+                            <div className="flex flex-col gap-6 mt-8 px-4">
                                 {/* Mobile Logo */}
                                 <div className="flex items-center gap-2">
                                     <div className="relative w-8 h-8">
@@ -96,9 +97,12 @@ export default function HeaderSection() {
                                             className="object-contain"
                                         />
                                     </div>
-                                    <span className="text-lg font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                                        FlashRend
-                                    </span>
+                                    <h1 className="font-bold font-mono">
+                                        <span className="text-primary">
+                                            Flash
+                                        </span>
+                                        Rend
+                                    </h1>
                                 </div>
 
                                 {/* Mobile Navigation Links */}
