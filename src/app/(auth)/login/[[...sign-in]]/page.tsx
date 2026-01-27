@@ -1,10 +1,47 @@
 "use client";
 
+import { useState } from "react";
+import { useSignIn } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { SignIn } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { Loader2, AlertCircle } from "lucide-react";
+import {
+    IconBrandGoogleFilled,
+    IconBrandAppleFilled,
+} from "@tabler/icons-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
+    const { isLoaded, signIn } = useSignIn();
+    const [isSocialLoading, setIsSocialLoading] = useState<
+        "google" | "apple" | null
+    >(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSocialSignIn = async (
+        strategy: "oauth_google" | "oauth_apple",
+    ) => {
+        if (!isLoaded || !signIn) return;
+
+        setIsSocialLoading(strategy === "oauth_google" ? "google" : "apple");
+        setError(null);
+
+        try {
+            await signIn.authenticateWithRedirect({
+                strategy,
+                redirectUrl: "/account",
+                redirectUrlComplete: "/account",
+            });
+        } catch (err: any) {
+            const errorMessage =
+                err?.errors?.[0]?.message || "Erreur lors de la connexion";
+            setError(errorMessage);
+            toast.error(errorMessage);
+            setIsSocialLoading(null);
+        }
+    };
+
     return (
         <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
             {/* Background Gradient */}
@@ -15,9 +52,9 @@ export default function LoginPage() {
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-linear-to-l from-amber-500/20 to-orange-600/20 rounded-full blur-3xl opacity-30 animate-pulse" />
 
             {/* Main Container */}
-            <div className="relative z-10 w-fit mx-auto px-4 sm:px-6">
+            <div className="relative z-10 w-full max-w-md mx-auto px-4 sm:px-6">
                 {/* Card with Glassmorphism */}
-                <div className="bg-white/10 dark:bg-slate-950/40 backdrop-blur-xl backdrop-saturate-150 border border-slate-800/30 rounded-2xl p-8 sm:p-10 shadow-2xl">
+                <div className="bg-white/10 dark:bg-slate-950/40 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-slate-800/30 rounded-2xl p-8 sm:p-10 shadow-2xl">
                     {/* Header */}
                     <div className="text-center mb-8">
                         {/* Logo */}
@@ -33,47 +70,64 @@ export default function LoginPage() {
                                     className="object-contain transition-transform group-hover:scale-110"
                                 />
                             </div>
-                            {/* Title */}
-                            <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                                FlashRend
-                            </h1>
                         </Link>
 
+                        {/* Title */}
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-2 bg-linear-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                            FlashRend
+                        </h1>
                         <p className="text-foreground/60 text-sm">
-                            Connectez-vous à votre compte
+                            Connectez-vous avec votre compte
                         </p>
                     </div>
 
-                    {/* Clerk SignIn Component */}
-                    <div className="mb-6">
-                        <SignIn
-                            routing="path"
-                            path="/login"
-                            afterSignInUrl="/account"
-                            forceRedirectUrl="/account"
-                            appearance={{
-                                elements: {
-                                    rootBox: "w-full",
-                                    card: "bg-transparent border-0 shadow-none",
-                                    headerTitle: "hidden",
-                                    headerSubtitle: "hidden",
-                                    dividerLine: "bg-white/10",
-                                    dividerText: "text-foreground/50 text-xs",
-                                    formFieldLabel:
-                                        "text-foreground text-sm font-medium",
-                                    formFieldInput:
-                                        "bg-white/10 border border-white/20 text-foreground placeholder:text-foreground/40 focus:bg-white/15 focus:border-amber-500/50 rounded-lg",
-                                    formButtonPrimary:
-                                        "bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg",
-                                    footerActionLink:
-                                        "text-amber-500 hover:text-amber-400",
-                                    socialButtonsBlockButton:
-                                        "border border-white/20 bg-white/5 hover:bg-white/10 text-foreground mb-4",
-                                    socialButtonsBlockButtonText:
-                                        "text-sm font-medium",
-                                },
-                            }}
-                        />
+                    {/* Error Message */}
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3">
+                            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
+                            <p className="text-sm text-red-400">{error}</p>
+                        </div>
+                    )}
+
+                    {/* OAuth Buttons */}
+                    <div className="space-y-3">
+                        <Button
+                            onClick={() => handleSocialSignIn("oauth_google")}
+                            disabled={isSocialLoading !== null}
+                            variant="outline"
+                            className="w-full border-white/20 hover:bg-white/10 text-foreground h-10"
+                        >
+                            {isSocialLoading === "google" ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Google...
+                                </>
+                            ) : (
+                                <>
+                                    <IconBrandGoogleFilled className="mr-2 h-4 w-4" />
+                                    Continuer avec Google
+                                </>
+                            )}
+                        </Button>
+
+                        <Button
+                            onClick={() => handleSocialSignIn("oauth_apple")}
+                            disabled={isSocialLoading !== null}
+                            variant="outline"
+                            className="w-full border-white/20 hover:bg-white/10 text-foreground h-10"
+                        >
+                            {isSocialLoading === "apple" ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Apple...
+                                </>
+                            ) : (
+                                <>
+                                    <IconBrandAppleFilled className="mr-2 h-4 w-4" />
+                                    Continuer avec Apple
+                                </>
+                            )}
+                        </Button>
                     </div>
 
                     {/* Back to Home */}
@@ -86,6 +140,11 @@ export default function LoginPage() {
                         </Link>
                     </div>
                 </div>
+
+                {/* Bottom Info */}
+                <p className="text-center text-xs text-foreground/40 mt-6">
+                    Votre compte est sécurisé et protégé
+                </p>
             </div>
         </div>
     );
