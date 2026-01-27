@@ -117,13 +117,13 @@ export default function HeaderSection() {
                                             {link.label}
                                         </Link>
                                     ))}
-                                    <a
-                                        href="/#contact"
+                                    <Link
+                                        href="/contact"
                                         className="text-foreground/70 hover:text-foreground transition-colors font-medium"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         Contact
-                                    </a>
+                                    </Link>
                                 </nav>
 
                                 {/* Mobile CTA */}

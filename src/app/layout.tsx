@@ -3,6 +3,14 @@ import { Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import {
+    ClerkProvider,
+    SignInButton,
+    SignUpButton,
+    SignedIn,
+    SignedOut,
+    UserButton,
+} from "@clerk/nextjs";
 
 const spaceGrotesk = Space_Grotesk({
     variable: "--font-space-grotesk",
@@ -78,20 +86,22 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
-            <body
-                className={`${spaceGrotesk.variable} ${spaceMono.variable} antialiased font-grotesk scroll-smooth`}
-            >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
-                    disableTransitionOnChange
+        <ClerkProvider>
+            <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
+                <body
+                    className={`${spaceGrotesk.variable} ${spaceMono.variable} antialiased font-grotesk scroll-smooth`}
                 >
-                    {children}
-                    <Toaster />
-                </ThemeProvider>
-            </body>
-        </html>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="dark"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        {children}
+                        <Toaster />
+                    </ThemeProvider>
+                </body>
+            </html>
+        </ClerkProvider>
     );
 }
