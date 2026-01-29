@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSignIn, useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useSignIn } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,19 +14,10 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
     const { isLoaded, signIn } = useSignIn();
-    const { isSignedIn } = useAuth();
-    const router = useRouter();
     const [isSocialLoading, setIsSocialLoading] = useState<
         "google" | "apple" | null
     >(null);
     const [error, setError] = useState<string | null>(null);
-
-    // Rediriger si déjà connecté
-    useEffect(() => {
-        if (isSignedIn) {
-            router.push("/account");
-        }
-    }, [isSignedIn, router]);
 
     const handleSocialSignIn = async (
         strategy: "oauth_google" | "oauth_apple",
@@ -40,11 +30,9 @@ export default function LoginPage() {
         try {
             await signIn.authenticateWithRedirect({
                 strategy,
-                redirectUrl: "/account",
+                redirectUrl: "/sso-callback",
                 redirectUrlComplete: "/account",
             });
-            toast.success("Redirection en cours...");
-            router.push("/account");
         } catch (err: any) {
             const errorMessage =
                 err?.errors?.[0]?.message || "Erreur lors de la connexion";

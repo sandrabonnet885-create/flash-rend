@@ -1,8 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
+import { SignedIn } from "@clerk/nextjs";
 import {
     Sidebar,
     SidebarContent,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import AccountSidebar from "@/components/account/account-sidebar";
+import UserMenu from "@/components/account/user-menu";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
     return (
@@ -43,15 +43,9 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                             <h1 className="text-lg font-semibold text-foreground">
                                 Mon Compte
                             </h1>
-                            <div className="text-white!">
-                                <SignedIn>
-                                    <UserButton
-                                        afterSignOutUrl="/login"
-                                        showName={true}
-                                        afterMultiSessionSingleSignOutUrl="/login"
-                                    />
-                                </SignedIn>
-                            </div>
+                            <SignedIn>
+                                <UserMenu />
+                            </SignedIn>
                         </div>
                     </div>
 
