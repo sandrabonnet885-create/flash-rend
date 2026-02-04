@@ -105,7 +105,7 @@ export default function AccountSidebar() {
                             <button
                                 className={cn(
                                     "w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-sm transition-colors",
-                                    "text-foreground/70 hover:text-foreground hover:bg-white/10",
+                                    "text-foreground/70 hover:text-foreground hover:bg-white/10"
                                 )}
                             >
                                 <item.icon className="h-5 w-5" />
@@ -126,7 +126,7 @@ export default function AccountSidebar() {
                                                 "px-3 py-2 rounded-lg text-sm transition-colors",
                                                 isActive(subItem.href)
                                                     ? "text-amber-500 bg-amber-500/10 font-semibold"
-                                                    : "text-foreground/60 hover:text-foreground hover:bg-white/10",
+                                                    : "text-foreground/60 hover:text-foreground hover:bg-white/10"
                                             )}
                                         >
                                             {subItem.title}
@@ -143,7 +143,7 @@ export default function AccountSidebar() {
                                     "flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-sm transition-colors",
                                     isActive(item.href)
                                         ? "text-amber-500 bg-amber-500/10"
-                                        : "text-foreground/70 hover:text-foreground hover:bg-white/10",
+                                        : "text-foreground/70 hover:text-foreground hover:bg-white/10"
                                 )}
                             >
                                 <item.icon className="h-5 w-5" />
