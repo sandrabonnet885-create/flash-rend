@@ -1,41 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Loader2, CreditCard } from "lucide-react";
 import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { ButtonHTMLAttributes, ReactNode } from "react";
 
-interface StripePaymentButtonProps {
+type StripePaymentButtonProps = Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    "onError"
+> & {
     amount: number;
     description: string;
     onSuccess?: () => void;
     onError?: (error: Error) => void;
-    className?: string;
-    children?: React.ReactNode;
-}
+    children: ReactNode;
+};
 
 export function StripePaymentButton({
     amount,
     description,
     onSuccess,
     onError,
-    className = "",
     children,
+    ...props
 }: StripePaymentButtonProps) {
-    const { user } = useUser();
     const [isLoading, setIsLoading] = useState(false);
+    const { user } = useUser();
+    const router = useRouter();
 
-    const handlePayment = async () => {
+    const handleClick = async () => {
         if (!user) {
-            toast.error(
-                "Veuvez-vous vous connecter pour effectuer un paiement"
-            );
-            return;
-        }
-
-        if (amount < 1) {
-            toast.error("Le montant doit être supérieur à 0");
+            router.push("/sign-in");
             return;
         }
 
@@ -44,34 +41,28 @@ export function StripePaymentButton({
         try {
             const response = await fetch("/api/stripe/checkout", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
                     amount,
-                    userEmail: user.emailAddresses[0]?.emailAddress,
+                    userEmail: user.emailAddresses[0].emailAddress,
                     userId: user.id,
-                    description,
                 }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(
-                    error.error || "Erreur lors de la création du paiement"
-                );
+                throw new Error(data.error || "Erreur lors du paiement");
             }
 
-            const { url } = await response.json();
-            if (url) {
-                window.location.href = url;
-                onSuccess?.();
-            }
+            // Rediriger vers la page de paiement Stripe
+            window.location.href = data.url;
+            onSuccess?.();
         } catch (error) {
             console.error("Payment error:", error);
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Une erreur est survenue";
-            toast.error(`Erreur de paiement: ${errorMessage}`);
+            toast.error("Une erreur est survenue lors du paiement");
             onError?.(error as Error);
         } finally {
             setIsLoading(false);
@@ -80,21 +71,11 @@ export function StripePaymentButton({
 
     return (
         <Button
-            onClick={handlePayment}
-            disabled={isLoading || amount < 1}
-            className={`${className} gap-2`}
+            onClick={handleClick}
+            disabled={isLoading || !amount || amount < 1}
+            {...props}
         >
-            {isLoading ? (
-                <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Traitement...
-                </>
-            ) : (
-                <>
-                    <CreditCard className="h-4 w-4" />
-                    {children || `Payer ${amount.toFixed(2)}€`}
-                </>
-            )}
+            {isLoading ? "Traitement..." : children}
         </Button>
     );
 }

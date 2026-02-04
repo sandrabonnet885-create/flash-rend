@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String        @id @default(cuid())
+  clerkId       String        @unique
+  email         String        @unique
+  firstName     String?
+  lastName      String?
+  balance       Float         @default(0)
+  transactions  Transaction[]
+  bankAccounts  BankAccount[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+model Transaction {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  amount          Float
+  currency        String        @default("EUR")
+  type            TransactionType
+  status          TransactionStatus @default(PENDING)
+  description     String?
+  reference       String?       @unique
+  metadata        Json?
+  stripePaymentId String?
+  bankTransferId  String?
+  bankAccount     BankAccount?  @relation(fields: [bankAccountId], references: [id])
+  bankAccountId   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  @@index([userId])
+  @@index([stripePaymentId])
+  @@index([bankTransferId])
+}
+model BankAccount {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  accountHolder String
+  iban          String
+  bic           String?
+  bankName      String?
+  isDefault     Boolean       @default(false)
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  @@unique([userId, iban])
+}
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  INVESTMENT
+  DIVIDEND
+  REFUND
+  FEE
+}
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
