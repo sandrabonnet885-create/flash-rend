@@ -32,13 +32,23 @@ export function StripePaymentButton({
 
     const handleClick = async () => {
         if (!user) {
-            router.push("/sign-in");
+            router.push("/login");
             return;
         }
 
         setIsLoading(true);
 
         try {
+            const userInDb = await fetch(`/api/users/${user.id}`).then((res) =>
+                res.json(),
+            );
+
+            if (!userInDb) {
+                throw new Error(
+                    "Problème avec votre compte. Veuillez vous reconnecter.",
+                );
+            }
+
             const response = await fetch("/api/stripe/checkout", {
                 method: "POST",
                 headers: {

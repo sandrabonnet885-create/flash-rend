@@ -36,23 +36,24 @@ export async function POST(req: Request) {
 }
 
 async function handleCheckoutSessionCompleted(session: any) {
-    const userId = session.client_reference_id;
-    if (!userId) {
+    const clerkUserId = session.client_reference_id;
+
+    if (!clerkUserId) {
         console.error("Aucun client_reference_id trouvé dans la session");
         return;
     }
 
-    const amount = session.amount_total ? session.amount_total / 100 : 0;
-
     // Trouver l'utilisateur par son ID Clerk
     const user = await prisma.user.findUnique({
-        where: { clerkId: userId },
+        where: { clerkId: clerkUserId },
     });
 
     if (!user) {
-        console.error(`Utilisateur non trouvé avec l'ID: ${userId}`);
+        console.error(`Utilisateur non trouvé avec l'ID Clerk: ${clerkUserId}`);
         return;
     }
+
+    const amount = session.amount_total ? session.amount_total / 100 : 0;
 
     await prisma.$transaction(async (tx) => {
         // Créer la transaction
