@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { CheckCircle, Loader2 } from "lucide-react";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
     const searchParams = useSearchParams();
     const sessionId = searchParams.get("session_id");
     const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +30,7 @@ export default function PaymentSuccessPage() {
 
             try {
                 const response = await fetch(
-                    `/api/stripe/verify-session?session_id=${sessionId}`,
+                    `/api/stripe/verify-session?session_id=${sessionId}`
                 );
 
                 if (!response.ok) {
@@ -166,5 +166,22 @@ export default function PaymentSuccessPage() {
                 </Card>
             </div>
         </div>
+    );
+}
+
+export default function PaymentSuccessPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="flex flex-col items-center">
+                        <Loader2 className="h-12 w-12 animate-spin text-amber-500 mb-4" />
+                        <p className="text-lg">Chargement...</p>
+                    </div>
+                </div>
+            }
+        >
+            <PaymentSuccessContent />
+        </Suspense>
     );
 }
