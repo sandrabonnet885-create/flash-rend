@@ -49,14 +49,33 @@ export async function POST(req: Request) {
         const { id, email_addresses, first_name, last_name } = evt.data;
 
         console.log(`[Clerk Webhook] Creating user: ${id}`);
+        console.log(
+            `[Clerk Webhook] Event data:`,
+            JSON.stringify(evt.data, null, 2),
+        );
+        console.log(
+            `[Clerk Webhook] Email addresses:`,
+            JSON.stringify(email_addresses, null, 2),
+        );
+
+        if (!email_addresses || email_addresses.length === 0) {
+            console.error("[Clerk Webhook] ❌ No email addresses provided");
+            return NextResponse.json(
+                { error: "No email addresses provided" },
+                { status: 400 },
+            );
+        }
 
         try {
+            const userEmail = email_addresses[0].email_address;
+            console.log(`[Clerk Webhook] Using email: ${userEmail}`);
+
             const newUser = await prisma.user.create({
                 data: {
                     clerkId: id,
-                    email: email_addresses[0].email_address,
-                    firstName: first_name,
-                    lastName: last_name,
+                    email: userEmail,
+                    firstName: first_name || "",
+                    lastName: last_name || "",
                     balance: 0,
                 },
             });
@@ -68,8 +87,9 @@ export async function POST(req: Request) {
         } catch (error) {
             console.error(
                 "[Clerk Webhook] ❌ Error creating user in database:",
-                error,
+                error instanceof Error ? error.message : String(error),
             );
+            console.error("[Clerk Webhook] Full error:", error);
             return NextResponse.json(
                 { error: "Error creating user in database" },
                 { status: 500 },
@@ -79,14 +99,22 @@ export async function POST(req: Request) {
         const { id, email_addresses, first_name, last_name } = evt.data;
 
         console.log(`[Clerk Webhook] Updating user: ${id}`);
+        console.log(
+            `[Clerk Webhook] Update data:`,
+            JSON.stringify(
+                { id, email_addresses, first_name, last_name },
+                null,
+                2,
+            ),
+        );
 
         try {
             const updatedUser = await prisma.user.update({
                 where: { clerkId: id },
                 data: {
                     email: email_addresses?.[0]?.email_address,
-                    firstName: first_name,
-                    lastName: last_name,
+                    firstName: first_name || undefined,
+                    lastName: last_name || undefined,
                 },
             });
 
@@ -94,7 +122,10 @@ export async function POST(req: Request) {
                 `[Clerk Webhook] ✅ User updated successfully: ${updatedUser.id}`,
             );
         } catch (error) {
-            console.error("[Clerk Webhook] ❌ Error updating user:", error);
+            console.error(
+                "[Clerk Webhook] ❌ Error updating user:",
+                error instanceof Error ? error.message : String(error),
+            );
         }
     } else if (eventType === "user.deleted") {
         const { id } = evt.data;
@@ -104,23 +135,35 @@ export async function POST(req: Request) {
         try {
             // Supprimer toutes les données associées
             await prisma.$transaction(async (tx) => {
-                await tx.transaction.deleteMany({
+                const deletedTransactions = await tx.transaction.deleteMany({
                     where: { user: { clerkId: id } },
                 });
 
-                await tx.bankAccount.deleteMany({
+                const deletedBankAccounts = await tx.bankAccount.deleteMany({
                     where: { user: { clerkId: id } },
                 });
 
-                await tx.user.delete({
+                const deletedUser = await tx.user.delete({
                     where: { clerkId: id },
                 });
+
+                console.log(
+                    `[Clerk Webhook] Deleted ${deletedTransactions.count} transactions`,
+                );
+                console.log(
+                    `[Clerk Webhook] Deleted ${deletedBankAccounts.count} bank accounts`,
+                );
             });
 
             console.log(`[Clerk Webhook] ✅ User deleted successfully: ${id}`);
         } catch (error) {
-            console.error("[Clerk Webhook] ❌ Error deleting user:", error);
+            console.error(
+                "[Clerk Webhook] ❌ Error deleting user:",
+                error instanceof Error ? error.message : String(error),
+            );
         }
+    } else {
+        console.log(`[Clerk Webhook] ⚠️  Unhandled event type: ${eventType}`);
     }
 
     console.log(`[Clerk Webhook] ✅ Event processed successfully`);
