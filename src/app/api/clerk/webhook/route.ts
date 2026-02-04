@@ -70,8 +70,14 @@ export async function POST(req: Request) {
             const userEmail = email_addresses[0].email_address;
             console.log(`[Clerk Webhook] Using email: ${userEmail}`);
 
-            const newUser = await prisma.user.create({
-                data: {
+            const newUser = await prisma.user.upsert({
+                where: { clerkId: id },
+                update: {
+                    email: userEmail,
+                    firstName: first_name || "",
+                    lastName: last_name || "",
+                },
+                create: {
                     clerkId: id,
                     email: userEmail,
                     firstName: first_name || "",
@@ -81,7 +87,7 @@ export async function POST(req: Request) {
             });
 
             console.log(
-                `[Clerk Webhook] ✅ User created successfully: ${newUser.id}`,
+                `[Clerk Webhook] ✅ User created/updated successfully: ${newUser.id}`,
                 `Email: ${newUser.email}`,
             );
         } catch (error) {
