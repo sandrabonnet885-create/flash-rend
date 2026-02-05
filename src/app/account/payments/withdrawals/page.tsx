@@ -109,8 +109,8 @@ export default function WithdrawalPage() {
     };
 
     const handleWithdrawal = async () => {
-        if (!amount || parseFloat(amount) < 10) {
-            toast.error("Le montant minimum de retrait est de 10€");
+        if (!amount || parseFloat(amount) < 1) {
+            toast.error("Le montant minimum de retrait est de 1€");
             return;
         }
 
@@ -190,7 +190,7 @@ export default function WithdrawalPage() {
                                 </span>
                             </div>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Montant minimum : 10€
+                                Montant minimum : 1€
                             </p>
                         </div>
 
@@ -316,7 +316,7 @@ export default function WithdrawalPage() {
                                 disabled={
                                     !amount ||
                                     !selectedAccount ||
-                                    parseFloat(amount) < 10 ||
+                                    parseFloat(amount) < 1 ||
                                     isProcessing
                                 }
                                 className="w-full h-14 text-lg"
@@ -347,7 +347,7 @@ export default function WithdrawalPage() {
                                     <li>
                                         Vous devez disposer d'un solde suffisant.
                                     </li>
-                                    <li>Montant minimum de retrait : 10€</li>
+                                    <li>Montant minimum de retrait : 1€</li>
                                 </ul>
                             </div>
                         </div>

@@ -12,8 +12,8 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { amount, bankAccountId } = body;
 
-        if (!amount || amount < 10) {
-            return new NextResponse("Invalid amount (min 10€)", { status: 400 });
+        if (!amount || amount < 1) {
+            return new NextResponse("Invalid amount (min 1€)", { status: 400 });
         }
 
         if (!bankAccountId) {
