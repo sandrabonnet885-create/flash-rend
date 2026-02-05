@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useSignIn } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
+import { useSignIn, useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,19 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
     const { isLoaded, signIn } = useSignIn();
+    const { isSignedIn, isLoaded: userLoaded } = useUser();
+    const router = useRouter();
     const [isSocialLoading, setIsSocialLoading] = useState<
         "google" | "apple" | null
     >(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Redirect if user is already signed in
+    useEffect(() => {
+        if (userLoaded && isSignedIn) {
+            router.push("/account");
+        }
+    }, [userLoaded, isSignedIn, router]);
 
     const handleSocialSignIn = async (
         strategy: "oauth_google" | "oauth_apple",
@@ -41,6 +51,21 @@ export default function LoginPage() {
             setIsSocialLoading(null);
         }
     };
+
+    // Show loading while checking authentication status
+    if (!userLoaded) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
+                <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+            </div>
+        );
+    }
+
+    // If user is signed in, they will be redirected by useEffect
+    // Show nothing to prevent flash
+    if (isSignedIn) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
