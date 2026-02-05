@@ -27,11 +27,11 @@ const menuItems = [
         icon: Home,
         href: "/account",
     },
-    {
+    /* {
         title: "Portfolio",
         icon: Wallet,
         href: "/account/portfolio",
-    },
+    }, */
     {
         title: "Investissements",
         icon: TrendingUp,
@@ -68,7 +68,7 @@ const menuItems = [
             },
         ],
     },
-    {
+    /* {
         title: "Analytique",
         icon: BarChart3,
         href: "/account/analytics",
@@ -77,7 +77,7 @@ const menuItems = [
         title: "Suivi",
         icon: Eye,
         href: "/account/watchlist",
-    },
+    }, */
     {
         title: "Paramètres",
         icon: Settings,

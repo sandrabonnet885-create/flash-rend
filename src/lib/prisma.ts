@@ -4,6 +4,7 @@ import { Pool } from "pg";
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }, // Fixes "SSL modes treated as verify-full" warning/error by being explicit
 });
 
 const adapter = new PrismaPg(pool);

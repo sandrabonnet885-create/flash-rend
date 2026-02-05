@@ -95,13 +95,6 @@ export default function UserMenu() {
                 </div>
 
                 {/* Menu Items */}
-                <DropdownMenuItem
-                    onClick={() => router.push("/account")}
-                    className="cursor-pointer text-foreground/80 hover:text-foreground"
-                >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
-                </DropdownMenuItem>
 
                 <DropdownMenuItem
                     onClick={() => router.push("/account/settings")}
