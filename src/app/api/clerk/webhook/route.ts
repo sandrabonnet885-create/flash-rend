@@ -70,14 +70,50 @@ export async function POST(req: Request) {
             const userEmail = email_addresses[0].email_address;
             console.log(`[Clerk Webhook] Using email: ${userEmail}`);
 
-            const newUser = await prisma.user.upsert({
+            // 1. D'abord, vérifier si un utilisateur avec ce Clerk ID existe déjà
+            const existingUserByClerkId = await prisma.user.findUnique({
                 where: { clerkId: id },
-                update: {
-                    email: userEmail,
-                    firstName: first_name || "",
-                    lastName: last_name || "",
-                },
-                create: {
+            });
+
+            if (existingUserByClerkId) {
+                console.log(`[Clerk Webhook] User already exists with Clerk ID: ${id}. Updating...`);
+                const updatedUser = await prisma.user.update({
+                    where: { clerkId: id },
+                    data: {
+                        email: userEmail,
+                        firstName: first_name || "",
+                        lastName: last_name || "",
+                    },
+                });
+                console.log(`[Clerk Webhook] ✅ User updated successfully: ${updatedUser.id}`);
+                return new Response("", { status: 200 });
+            }
+
+            // 2. Si non, vérifier si un utilisateur avec cet email existe déjà
+            const existingUserByEmail = await prisma.user.findUnique({
+                where: { email: userEmail },
+            });
+
+            if (existingUserByEmail) {
+                console.log(
+                    `[Clerk Webhook] ⚠️ Email ${userEmail} already taken by user ${existingUserByEmail.id}. Linking to new Clerk ID: ${id}`,
+                );
+                const linkedUser = await prisma.user.update({
+                    where: { email: userEmail },
+                    data: {
+                        clerkId: id,
+                        firstName: first_name || "",
+                        lastName: last_name || "",
+                    },
+                });
+                console.log(`[Clerk Webhook] ✅ User account linked successfully: ${linkedUser.id}`);
+                return new Response("", { status: 200 });
+            }
+
+            // 3. Si aucun des deux, créer un nouvel utilisateur
+            console.log(`[Clerk Webhook] Creating new user...`);
+            const newUser = await prisma.user.create({
+                data: {
                     clerkId: id,
                     email: userEmail,
                     firstName: first_name || "",
@@ -87,51 +123,17 @@ export async function POST(req: Request) {
             });
 
             console.log(
-                `[Clerk Webhook] ✅ User created/updated successfully: ${newUser.id}`,
+                `[Clerk Webhook] ✅ User created successfully: ${newUser.id}`,
                 `Email: ${newUser.email}`,
             );
-        } catch (error: any) {
-            // Handle unique constraint violation (likely email collision)
-            // Since we upsert on clerkId, a P2002 error here means the EMAIL already exists on a DIFFERENT clerkId record
-            if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-                const userEmail = email_addresses[0].email_address;
-                console.log(
-                    `[Clerk Webhook] ⚠️ Email ${userEmail} already taken. Linking to new Clerk ID: ${id}`,
-                );
-
-                try {
-                    // Start a transaction to safe link
-                    const linkedUser = await prisma.user.update({
-                        where: { email: userEmail },
-                        data: {
-                            clerkId: id,
-                            firstName: first_name || "",
-                            lastName: last_name || "",
-                        },
-                    });
-
-                    console.log(
-                        `[Clerk Webhook] ✅ User account linked successfully: ${linkedUser.id}`,
-                    );
-                    return new Response("", { status: 200 });
-                } catch (linkError) {
-                    console.error(
-                        "[Clerk Webhook] ❌ Error linking user account:",
-                        linkError instanceof Error
-                            ? linkError.message
-                            : String(linkError),
-                    );
-                    // Fall through to generic error response
-                }
-            }
-
+        } catch (error) {
             console.error(
-                "[Clerk Webhook] ❌ Error creating/upserting user in database:",
+                "[Clerk Webhook] ❌ Error processing user:",
                 error instanceof Error ? error.message : String(error),
             );
             console.error("[Clerk Webhook] Full error:", error);
             return NextResponse.json(
-                { error: "Error creating user in database" },
+                { error: "Error processing user" },
                 { status: 500 },
             );
         }
