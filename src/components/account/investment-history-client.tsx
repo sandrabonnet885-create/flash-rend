@@ -91,6 +91,12 @@ export default function InvestmentHistoryClient() {
         return <span className="font-mono text-amber-600">{timeLeft || "Calcul..."}</span>;
     };
 
+    const statusLabels = {
+        ACTIVE: "En cours",
+        COMPLETED: "Terminé",
+        CLOSED: "Fermé",
+    };
+
     if (loading) {
         return <div className="py-8 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" /></div>;
     }
@@ -130,7 +136,7 @@ export default function InvestmentHistoryClient() {
                             </TableCell>
                             <TableCell className="text-center">
                                 <Badge variant={inv.status === "ACTIVE" ? "default" : "secondary"}>
-                                    {inv.status}
+                                    {statusLabels[inv.status]}
                                 </Badge>
                             </TableCell>
                         </TableRow>
