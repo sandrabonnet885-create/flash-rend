@@ -1,168 +1,73 @@
 import { NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { getAuth } from "@clerk/nextjs/server";
-import { z } from "zod";
 
-// Schémas de validation
-const withdrawalSchema = z.object({
-    amount: z
-        .number()
-        .positive("Le montant doit être positif")
-        .min(1, "Montant minimum: 1€")
-        .max(50000, "Montant maximum: 50000€"),
-    bankAccountId: z.string().min(1, "ID du compte bancaire requis"),
-});
-
-type WithdrawalInput = z.infer<typeof withdrawalSchema>;
-
-const MIN_WITHDRAWAL = 10; // Montant minimum de retrait
-const MAX_WITHDRAWAL = 50000; // Montant maximum de retrait
-
-// POST /api/withdrawals - Créer une demande de retrait
 export async function POST(req: Request) {
     try {
-        const { userId: clerkUserId } = getAuth(req as any);
-
-        if (!clerkUserId) {
-            console.warn("[API] Unauthorized withdrawal attempt");
-            return NextResponse.json(
-                { error: "Non autorisé" },
-                { status: 401 },
-            );
-        }
-
-        // Parser et valider le body
-        const body = await req.json();
-        const validatedData = withdrawalSchema.parse(body);
-        const { amount, bankAccountId } = validatedData;
-
-        console.log(
-            `[API] Processing withdrawal for Clerk ID: ${clerkUserId}`,
-            `Amount: ${amount}€`,
-        );
-
-        // Vérifier que l'utilisateur existe
-        const user = await prisma.user.findUnique({
-            where: { clerkId: clerkUserId },
-        });
-
+        const user = await currentUser();
         if (!user) {
-            console.warn(`[API] User not found with Clerk ID: ${clerkUserId}`);
-            return NextResponse.json(
-                { error: "Utilisateur non trouvé" },
-                { status: 404 },
-            );
+            return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        // Vérifier le montant minimum
-        if (amount < MIN_WITHDRAWAL) {
-            console.warn(
-                `[API] Withdrawal amount below minimum: ${amount}€ < ${MIN_WITHDRAWAL}€`,
-            );
-            return NextResponse.json(
-                {
-                    error: `Montant minimum de retrait: ${MIN_WITHDRAWAL}€`,
-                },
-                { status: 400 },
-            );
+        const body = await req.json();
+        const { amount, bankAccountId } = body;
+
+        if (!amount || amount < 10) {
+            return new NextResponse("Invalid amount (min 10€)", { status: 400 });
         }
 
-        // Vérifier le solde
-        if (user.balance < amount) {
-            console.warn(
-                `[API] Insufficient balance for user ${user.id}: ${user.balance}€ < ${amount}€`,
-            );
-            return NextResponse.json(
-                {
-                    error: `Solde insuffisant (Solde: ${user.balance}€)`,
-                    currentBalance: user.balance,
-                },
-                { status: 400 },
-            );
+        if (!bankAccountId) {
+            return new NextResponse("Bank account required", { status: 400 });
         }
 
-        // Vérifier que le compte bancaire appartient bien à l'utilisateur
-        const bankAccount = await prisma.bankAccount.findFirst({
-            where: {
-                id: bankAccountId,
-                userId: user.id,
-            },
+        // 1. Get User and verify balance
+        const dbUser = await prisma.user.findUnique({
+            where: { clerkId: user.id },
         });
 
-        if (!bankAccount) {
-            console.warn(
-                `[API] Bank account not found: ${bankAccountId} for user ${user.id}`,
-            );
-            return NextResponse.json(
-                { error: "Compte bancaire non trouvé" },
-                { status: 404 },
-            );
+        if (!dbUser) {
+            return new NextResponse("User not found", { status: 404 });
         }
 
-        // Créer la transaction de retrait dans une transaction DB
-        const transaction = await prisma.$transaction(async (tx) => {
-            // Créer la transaction de retrait
-            const withdrawalTransaction = await tx.transaction.create({
+        if (dbUser.balance < amount) {
+            return new NextResponse("Insufficient funds", { status: 400 });
+        }
+
+        // 2. Create Transaction (WITHDRAWAL, PENDING)
+        // We use a transaction to ensure balance is not deducted yet OR deducted immediately?
+        // Usually for withdrawals, we deduct immediately to prevent double spend, 
+        // OR we just check it and deduct when approved.
+        // Let's deduct immediately to be safe "Reserved funds".
+        // If rejected, we refund.
+
+        const newBalance = dbUser.balance - amount;
+
+        const result = await prisma.$transaction(async (tx) => {
+            // Deduct balance
+            await tx.user.update({
+                where: { id: dbUser.id },
+                data: { balance: newBalance },
+            });
+
+            // Create Transaction
+            const transaction = await tx.transaction.create({
                 data: {
-                    userId: user.id,
-                    amount, // Montant positif
-                    currency: "EUR",
+                    userId: dbUser.id,
+                    amount: amount,
                     type: "WITHDRAWAL",
                     status: "PENDING",
-                    description: "Demande de retrait vers compte bancaire",
+                    description: "Retrait vers compte bancaire",
+                    currency: "EUR",
                     bankAccountId: bankAccountId,
-                    metadata: {
-                        bankName: bankAccount.bankName,
-                        accountHolder: bankAccount.accountHolder,
-                        iban: bankAccount.iban.slice(-4), // Ne stocker que les 4 derniers caractères
-                        requestedAt: new Date().toISOString(),
-                    } as any,
                 },
             });
 
-            // Mettre à jour le solde (décrémenter)
-            const updatedUser = await tx.user.update({
-                where: { id: user.id },
-                data: {
-                    balance: {
-                        decrement: amount,
-                    },
-                },
-            });
-
-            console.log(
-                `[API] ✅ Withdrawal created for user ${user.id}`,
-                `Amount: ${amount}€, New balance: ${updatedUser.balance}€`,
-            );
-
-            return { transaction: withdrawalTransaction, updatedUser };
+            return transaction;
         });
 
-        return NextResponse.json({
-            success: true,
-            message: "Demande de retrait créée avec succès",
-            transaction: transaction.transaction,
-            newBalance: transaction.updatedUser.balance,
-        });
+        return NextResponse.json(result);
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            console.warn("[API] Validation error:", error.issues);
-            return NextResponse.json(
-                {
-                    error: "Données invalides",
-                    details: error.issues.map((e) => ({
-                        path: e.path.join("."),
-                        message: e.message,
-                    })),
-                },
-                { status: 400 },
-            );
-        }
-
-        console.error("[API] ❌ Error processing withdrawal:", error);
-        return NextResponse.json(
-            { error: "Erreur lors du traitement du retrait" },
-            { status: 500 },
-        );
+        console.error("[WITHDRAWALS_POST]", error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
 }

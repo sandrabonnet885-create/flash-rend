@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,25 @@ import {
     CardTitle,
     CardDescription,
 } from "@/components/ui/card";
-import { AlertCircle, Banknote, Loader2, Check } from "lucide-react";
+import { AlertCircle, Banknote, Loader2, Check, Plus } from "lucide-react";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 type BankAccount = {
     id: string;
-    last4: string;
+    iban: string;
+    bic: string;
     bankName: string;
+    accountHolder: string;
 };
 
 export default function WithdrawalPage() {
@@ -25,16 +37,75 @@ export default function WithdrawalPage() {
     const [amount, setAmount] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+    const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+    const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
 
-    // Données factices pour les comptes bancaires
-    const bankAccounts: BankAccount[] = [
-        { id: "1", last4: "4242", bankName: "Banque de France" },
-        { id: "2", last4: "1234", bankName: "Crédit Agricole" },
-    ];
+    // New Bank Account Form State
+    const [isAddingAccount, setIsAddingAccount] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newAccount, setNewAccount] = useState({
+        accountHolder: "",
+        iban: "",
+        bic: "",
+        bankName: "",
+    });
+
+    useEffect(() => {
+        fetchBankAccounts();
+    }, []);
+
+    const fetchBankAccounts = async () => {
+        setIsLoadingAccounts(true);
+        try {
+            const res = await fetch("/api/bank-accounts");
+            if (res.ok) {
+                const data = await res.json();
+                setBankAccounts(data);
+                if (data.length > 0) {
+                    setSelectedAccount(data[0].id);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching bank accounts:", error);
+            toast.error("Impossible de charger vos comptes bancaires");
+        } finally {
+            setIsLoadingAccounts(false);
+        }
+    };
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value.replace(/\D/g, ""); // N'autoriser que les chiffres
+        const value = e.target.value.replace(/[^0-9.]/g, "");
         setAmount(value);
+    };
+
+    const handleAddAccount = async () => {
+        if (!newAccount.iban || !newAccount.accountHolder) {
+            toast.error("Veuillez remplir les champs obligatoires");
+            return;
+        }
+
+        setIsAddingAccount(true);
+        try {
+            const res = await fetch("/api/bank-accounts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newAccount),
+            });
+
+            if (!res.ok) throw new Error("Erreur lors de l'ajout");
+
+            const account = await res.json();
+            setBankAccounts([account, ...bankAccounts]);
+            setSelectedAccount(account.id);
+            setOpenDialog(false);
+            setNewAccount({ accountHolder: "", iban: "", bic: "", bankName: "" });
+            toast.success("Compte bancaire ajouté avec succès");
+        } catch (error) {
+            console.error(error);
+            toast.error("Erreur lors de l'ajout du compte bancaire");
+        } finally {
+            setIsAddingAccount(false);
+        }
     };
 
     const handleWithdrawal = async () => {
@@ -51,39 +122,31 @@ export default function WithdrawalPage() {
         setIsProcessing(true);
 
         try {
-            // Simuler un appel API
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            const res = await fetch("/api/withdrawals", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: parseFloat(amount),
+                    bankAccountId: selectedAccount,
+                }),
+            });
 
-            // Ici, vous feriez un appel à votre API pour effectuer le retrait
-            // await fetch('/api/withdrawals', {
-            //     method: 'POST',
-            //     body: JSON.stringify({
-            //         amount: parseFloat(amount),
-            //         accountId: selectedAccount,
-            //         userId: user?.id
-            // })
-            // });
+            if (!res.ok) {
+                const msg = await res.text();
+                throw new Error(msg);
+            }
 
-            toast.success("Votre demande de retrait a été prise en compte");
+            toast.success("Votre demande de retrait a été envoyée !");
             setAmount("");
-            setSelectedAccount(null);
         } catch (error) {
             console.error("Withdrawal error:", error);
-            toast.error(
-                "Une erreur est survenue lors de votre demande de retrait"
-            );
+            toast.error("Erreur: Solde insuffisant ou problème serveur");
         } finally {
             setIsProcessing(false);
         }
     };
 
-    if (!user) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <p>Veuillez vous connecter pour effectuer un retrait</p>
-            </div>
-        );
-    }
+    if (!user) return null;
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -116,7 +179,7 @@ export default function WithdrawalPage() {
                                 <Input
                                     id="withdrawal-amount"
                                     type="text"
-                                    inputMode="numeric"
+                                    inputMode="decimal"
                                     value={amount}
                                     onChange={handleAmountChange}
                                     placeholder="Montant en €"
@@ -127,7 +190,7 @@ export default function WithdrawalPage() {
                                 </span>
                             </div>
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Solde disponible : 0.00€ • Montant minimum : 10€
+                                Montant minimum : 10€
                             </p>
                         </div>
 
@@ -137,43 +200,112 @@ export default function WithdrawalPage() {
                                 Compte bancaire de destination
                             </h3>
                             <div className="space-y-3">
-                                {bankAccounts.map((account) => (
-                                    <div
-                                        key={account.id}
-                                        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                                            selectedAccount === account.id
-                                                ? "border-primary bg-primary/5"
-                                                : "border-border hover:bg-muted/50"
-                                        }`}
-                                        onClick={() =>
-                                            setSelectedAccount(account.id)
-                                        }
-                                    >
-                                        <div className="bg-muted p-2 rounded-full mr-3">
-                                            <Banknote className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">
-                                                {account.bankName} ••••{" "}
-                                                {account.last4}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Compte courant
-                                            </p>
-                                        </div>
-                                        {selectedAccount === account.id && (
-                                            <div className="ml-auto text-primary">
-                                                <Check className="h-5 w-5" />
-                                            </div>
-                                        )}
+                                {isLoadingAccounts ? (
+                                    <div className="flex justify-center py-4">
+                                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                                     </div>
-                                ))}
-                                <Button
-                                    variant="outline"
-                                    className="w-full mt-2"
-                                >
-                                    + Ajouter un compte bancaire
-                                </Button>
+                                ) : bankAccounts.length === 0 ? (
+                                    <div className="text-center py-4 border border-dashed rounded-lg text-muted-foreground">
+                                        Aucun compte bancaire enregistré
+                                    </div>
+                                ) : (
+                                    bankAccounts.map((account) => (
+                                        <div
+                                            key={account.id}
+                                            className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                                                selectedAccount === account.id
+                                                    ? "border-primary bg-primary/5"
+                                                    : "border-border hover:bg-muted/50"
+                                            }`}
+                                            onClick={() =>
+                                                setSelectedAccount(account.id)
+                                            }
+                                        >
+                                            <div className="bg-muted p-2 rounded-full mr-3">
+                                                <Banknote className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">
+                                                    {account.bankName || "Banque"} ••••{" "}
+                                                    {account.iban.slice(-4)}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {account.accountHolder}
+                                                </p>
+                                            </div>
+                                            {selectedAccount === account.id && (
+                                                <div className="ml-auto text-primary">
+                                                    <Check className="h-5 w-5" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+
+                                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full mt-2"
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Ajouter un compte bancaire
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Ajouter un compte bancaire</DialogTitle>
+                                            <DialogDescription>
+                                                Ajoutez les coordonnées de votre compte pour recevoir vos retraits.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="space-y-4 py-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="holder">Titulaire du compte</Label>
+                                                <Input 
+                                                    id="holder" 
+                                                    placeholder="Nom Prénom"
+                                                    value={newAccount.accountHolder}
+                                                    onChange={(e) => setNewAccount({...newAccount, accountHolder: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="iban">IBAN</Label>
+                                                <Input 
+                                                    id="iban" 
+                                                    placeholder="FR76..."
+                                                    value={newAccount.iban}
+                                                    onChange={(e) => setNewAccount({...newAccount, iban: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="bic">BIC / SWIFT</Label>
+                                                <Input 
+                                                    id="bic" 
+                                                    placeholder="ABCDEF..."
+                                                    value={newAccount.bic}
+                                                    onChange={(e) => setNewAccount({...newAccount, bic: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="bankName">Nom de la banque (Optionnel)</Label>
+                                                <Input 
+                                                    id="bankName" 
+                                                    placeholder="Ex: Boursorama"
+                                                    value={newAccount.bankName}
+                                                    onChange={(e) => setNewAccount({...newAccount, bankName: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button variant="ghost" onClick={() => setOpenDialog(false)}>Annuler</Button>
+                                            <Button onClick={handleAddAccount} disabled={isAddingAccount}>
+                                                {isAddingAccount && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Ajouter
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
 
@@ -210,10 +342,10 @@ export default function WithdrawalPage() {
                                 <ul className="mt-2 space-y-1 list-disc pl-5">
                                     <li>
                                         Les retraits sont traités sous 1 à 3
-                                        jours ouvrables
+                                        jours ouvrables après validation.
                                     </li>
                                     <li>
-                                        Frais de retrait : 0.50€ par opération
+                                        Vous devez disposer d'un solde suffisant.
                                     </li>
                                     <li>Montant minimum de retrait : 10€</li>
                                 </ul>
