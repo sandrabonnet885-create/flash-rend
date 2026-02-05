@@ -1,5 +1,3 @@
-"use client";
-
 import {
     Card,
     CardContent,
@@ -9,16 +7,49 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, History } from "lucide-react";
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
-export default function AccountPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AccountPage() {
+    const user = await currentUser();
+
+    if (!user) {
+        redirect("/sign-in");
+    }
+
+    const dbUser = await prisma.user.findUnique({
+        where: { clerkId: user.id },
+        include: {
+            transactions: {
+                take: 5,
+                orderBy: { createdAt: "desc" },
+            },
+        },
+    });
+
+    if (!dbUser) {
+        // Fallback if webhook hasn't fired yet
+        return <div>Configuration du compte en cours...</div>;
+    }
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat("fr-FR", {
+            style: "currency",
+            currency: "EUR",
+        }).format(amount);
+    };
+
     return (
         <div className="space-y-8">
             {/* Welcome Header */}
             <div>
                 <h1 className="text-3xl font-bold mb-2">
-                    Bienvenue sur votre compte FlashRend
+                    Bienvenue, {dbUser.firstName || user.firstName}
                 </h1>
                 <p className="text-foreground/60">
                     Gérez vos investissements et suivez vos rendements en temps
@@ -35,9 +66,11 @@ export default function AccountPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">€0,00</div>
+                        <div className="text-2xl font-bold">
+                            {formatCurrency(dbUser.balance)}
+                        </div>
                         <p className="text-xs text-foreground/50 mt-1">
-                            Vos fonds investis
+                            Vos fonds disponibles
                         </p>
                     </CardContent>
                 </Card>
@@ -50,7 +83,7 @@ export default function AccountPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-500">
-                            €0,00
+                            {formatCurrency(0)}
                         </div>
                         <p className="text-xs text-foreground/50 mt-1">
                             +0% ce mois
@@ -88,15 +121,15 @@ export default function AccountPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-amber-500" />
-                            Nouvel investissement
+                            Investir
                         </CardTitle>
                         <CardDescription>
-                            Lancez une nouvelle session d'investissement
+                            Lancez un nouvel investissement
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -111,20 +144,42 @@ export default function AccountPage() {
                 <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <Wallet className="h-5 w-5 text-amber-500" />
-                            Gérer votre portefeuille
+                            <ArrowDownLeft className="h-5 w-5 text-green-500" />
+                            Dépôt
                         </CardTitle>
                         <CardDescription>
-                            Consultez et modifiez vos investissements
+                            Ajouter des fonds à votre compte
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Link href="/account/portfolio">
+                        <Link href="/account/payments">
                             <Button
                                 variant="outline"
                                 className="w-full border-white/20 hover:bg-white/10"
                             >
-                                Voir le portefeuille
+                                Ajouter des fonds
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                 <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <History className="h-5 w-5 text-blue-500" />
+                            Historique
+                        </CardTitle>
+                        <CardDescription>
+                            Voir toutes vos transactions
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link href="/account/payments/history">
+                            <Button
+                                variant="outline"
+                                className="w-full border-white/20 hover:bg-white/10"
+                            >
+                                Voir l'historique
                             </Button>
                         </Link>
                     </CardContent>
@@ -134,15 +189,75 @@ export default function AccountPage() {
             {/* Recent Activity */}
             <Card className="border-white/10 bg-white/5">
                 <CardHeader>
-                    <CardTitle>Activité récente</CardTitle>
-                    <CardDescription>
-                        Vos 5 dernières transactions
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle>Activité récente</CardTitle>
+                            <CardDescription>
+                                Vos 5 dernières transactions
+                            </CardDescription>
+                        </div>
+                        <Link href="/account/payments/history">
+                            <Button variant="ghost" size="sm">
+                                Voir tout <ArrowUpRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        </Link>
+                    </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-center py-8 text-foreground/60">
-                        <p>Aucune activité pour le moment</p>
-                    </div>
+                    {dbUser.transactions.length === 0 ? (
+                        <div className="text-center py-8 text-foreground/60">
+                            <p>Aucune activité pour le moment</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {dbUser.transactions.map((tx) => (
+                                <div
+                                    key={tx.id}
+                                    className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={`p-2 rounded-full ${
+                                            tx.type === 'DEPOSIT' ? 'bg-green-500/20 text-green-500' :
+                                            tx.type === 'WITHDRAWAL' ? 'bg-red-500/20 text-red-500' :
+                                            'bg-blue-500/20 text-blue-500'
+                                        }`}>
+                                            {tx.type === 'DEPOSIT' && <ArrowDownLeft className="h-4 w-4" />}
+                                            {tx.type === 'WITHDRAWAL' && <ArrowUpRight className="h-4 w-4" />}
+                                            {(tx.type !== 'DEPOSIT' && tx.type !== 'WITHDRAWAL') && <Wallet className="h-4 w-4" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">
+                                                {tx.description || tx.type}
+                                            </p>
+                                            <p className="text-xs text-foreground/50">
+                                                {new Date(tx.createdAt).toLocaleDateString('fr-FR', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className={`font-bold ${
+                                            tx.type === 'DEPOSIT' ? 'text-green-500' : 
+                                            tx.type === 'WITHDRAWAL' ? 'text-foreground' : 'text-blue-500'
+                                        }`}>
+                                            {tx.type === 'DEPOSIT' ? '+' : ''}
+                                            {formatCurrency(tx.amount)}
+                                        </p>
+                                        <Badge variant={
+                                            tx.status === 'COMPLETED' ? 'default' :
+                                            tx.status === 'PENDING' ? 'secondary' : 'destructive'
+                                        } className="text-[10px] h-5">
+                                            {tx.status}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

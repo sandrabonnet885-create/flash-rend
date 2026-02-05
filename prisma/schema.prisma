@@ -60,6 +60,7 @@ enum TransactionType {
   DIVIDEND
   REFUND
   FEE
+  BONUS
 }
 enum TransactionStatus {
   PENDING
