@@ -13,6 +13,7 @@ model User {
   firstName     String?
   lastName      String?
   balance       Float         @default(0)
+  bonusClaimed  Boolean       @default(false)
   transactions  Transaction[]
   bankAccounts  BankAccount[]
   investments   Investment[]

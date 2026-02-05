@@ -71,7 +71,11 @@ export default function InvestmentHistoryClient() {
 
                 if (diff <= 0) {
                     setTimeLeft("Terminé (Actualisation...)");
-                    // Trigger refresh slightly after
+                    // Trigger immediate refresh when investment completes
+                    setTimeout(() => {
+                        fetchInvestments();
+                        router.refresh();
+                    }, 2000); // Wait 2 seconds then refresh
                     return;
                 }
 

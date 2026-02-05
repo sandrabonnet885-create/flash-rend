@@ -88,8 +88,11 @@ export async function GET(req: Request) {
 
         if (!dbUser) return new NextResponse("User not found", { status: 404 });
 
+
         // Lazy Evaluation: Check for completed investments
         const now = new Date();
+        console.log("[INVESTMENT_GET] Checking for completed investments at:", now);
+        
         const pendingInvestments = await prisma.investment.findMany({
             where: {
                 userId: dbUser.id,
@@ -98,9 +101,13 @@ export async function GET(req: Request) {
             },
         });
 
+        console.log("[INVESTMENT_GET] Found", pendingInvestments.length, "completed investments to process");
+
         if (pendingInvestments.length > 0) {
             await prisma.$transaction(async (tx) => {
                 for (const inv of pendingInvestments) {
+                    console.log(`[INVESTMENT_GET] Processing investment ${inv.id}, crediting ${inv.potentialReturn}€`);
+                    
                     // Mark as COMPLETED
                     await tx.investment.update({
                         where: { id: inv.id },
@@ -126,9 +133,14 @@ export async function GET(req: Request) {
                             currency: "EUR",
                         },
                     });
+                    
+                    console.log(`[INVESTMENT_GET] Successfully credited investment ${inv.id}`);
                 }
             });
+            
+            console.log("[INVESTMENT_GET] All completed investments processed successfully");
         }
+
 
         // Fetch valid list (freshly updated)
         const investments = await prisma.investment.findMany({

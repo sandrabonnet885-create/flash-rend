@@ -12,6 +12,7 @@ import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { BonusClaimCard } from "@/components/bonus-claim-card";
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +122,10 @@ export default async function AccountPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Bonus Claim Card - Only shows if not claimed */}
+                <BonusClaimCard bonusClaimed={dbUser.bonusClaimed} />
+
                 <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
