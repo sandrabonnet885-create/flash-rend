@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCheckoutSession, formatAmountForDisplay } from "@/lib/stripe";
 
-const MAX_AMOUNT = 10000; // 100€ en centimes
-const MIN_AMOUNT = 100; // 1€ en centimes
+const MAX_AMOUNT_CENTS = 500000; // 5000€ en centimes
+const MIN_AMOUNT_CENTS = 100; // 1€ en centimes
+
+// Convertir en euros pour la validation
+const MAX_AMOUNT_EUR = MAX_AMOUNT_CENTS / 100; // 5000€
+const MIN_AMOUNT_EUR = MIN_AMOUNT_CENTS / 100; // 1€
 
 export async function POST(request: NextRequest) {
     try {
@@ -16,11 +20,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (amount < MIN_AMOUNT / 100) {
+        if (amount < MIN_AMOUNT_EUR) {
             return NextResponse.json(
                 {
                     error: `Le montant minimum est de ${formatAmountForDisplay(
-                        MIN_AMOUNT,
+                        MIN_AMOUNT_CENTS,
                         "eur"
                     )}`,
                 },
@@ -28,11 +32,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (amount > MAX_AMOUNT / 100) {
+        if (amount > MAX_AMOUNT_EUR) {
             return NextResponse.json(
                 {
                     error: `Le montant maximum est de ${formatAmountForDisplay(
-                        MAX_AMOUNT,
+                        MAX_AMOUNT_CENTS,
                         "eur"
                     )}`,
                 },
