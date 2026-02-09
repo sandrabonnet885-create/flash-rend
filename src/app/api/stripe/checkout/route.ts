@@ -59,36 +59,39 @@ export async function POST(request: NextRequest) {
         }
 
         // Créer la session de paiement
-        const session = await createCheckoutSession({
-            payment_method_types: ["card"],
-            customer_email: userEmail,
-            client_reference_id: userId,
-            line_items: [
-                {
-                    price_data: {
-                        currency: "eur",
-                        product_data: {
-                            name: "Crédit FlashRend",
-                            description: `Crédit de ${amount}€ pour votre compte FlashRend`,
+        const session = await createCheckoutSession(
+            {
+                payment_method_types: ["card"],
+                customer_email: userEmail,
+                client_reference_id: userId,
+                line_items: [
+                    {
+                        price_data: {
+                            currency: "eur",
+                            product_data: {
+                                name: "Crédit FlashRend",
+                                description: `Crédit de ${amount}€ pour votre compte FlashRend`,
+                            },
+                            unit_amount: Math.round(amount * 100), // Convertir en centimes
                         },
-                        unit_amount: Math.round(amount * 100), // Convertir en centimes
+                        quantity: 1,
                     },
-                    quantity: 1,
-                },
-            ],
-            metadata: {
-                userId,
-                amount: amount.toString(),
-                timestamp: new Date().toISOString(),
-            },
-            payment_intent_data: {
+                ],
                 metadata: {
                     userId,
                     amount: amount.toString(),
-                    description: `Crédit FlashRend - ${amount}€`,
+                    timestamp: new Date().toISOString(),
+                },
+                payment_intent_data: {
+                    metadata: {
+                        userId,
+                        amount: amount.toString(),
+                        description: `Crédit FlashRend - ${amount}€`,
+                    },
                 },
             },
-        });
+            request.url // Passer l'URL de la requête pour détecter le domaine
+        );
 
         return NextResponse.json({ url: session.url });
     } catch (error) {
