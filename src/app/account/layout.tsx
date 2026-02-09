@@ -25,6 +25,8 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                             <h2 className="text-lg font-bold bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
                                 FlashRend
                             </h2>
+                            {/* Close button for mobile */}
+                            <SidebarTrigger className="lg:hidden" />
                         </div>
                         <Separator className="bg-white/10" />
                     </SidebarHeader>
