@@ -4,6 +4,7 @@ import FooterSection from "@/components/sections/Footer";
 import HeaderSection from "@/components/sections/Header";
 import HeroSection from "@/components/sections/Hero";
 import SimulationSection from "@/components/sections/Simulation";
+import TestimonialsSection from "@/components/sections/Testimonials";
 import WhoItWorkSection from "@/components/sections/WhoItWork";
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
             <AboutSection />
             <WhoItWorkSection />
             <SimulationSection />
+            <TestimonialsSection />
             <FAQSection />
             <FooterSection />
         </main>

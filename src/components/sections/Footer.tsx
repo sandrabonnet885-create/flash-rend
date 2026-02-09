@@ -103,7 +103,7 @@ export default function FooterSection() {
                                     href="mailto:contact@flashrend.com"
                                     className="text-foreground/60 hover:text-foreground transition-colors text-sm"
                                 >
-                                    contact@flashrend.com
+                                    contact@flashrend.site
                                 </Link>
                             </li>
                             <li className="flex items-start gap-3">
