@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import CookieConsent from "@/components/cookie-consent";
+import TidioChat from "@/components/tidio-chat";
 import {
     ClerkProvider,
     SignInButton,
@@ -99,6 +100,7 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         {children}
+                        <TidioChat />
                         <CookieConsent />
                         <Toaster />
                     </ThemeProvider>
