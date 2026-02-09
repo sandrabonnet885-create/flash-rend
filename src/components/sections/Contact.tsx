@@ -24,8 +24,8 @@ const contactInfo = [
     {
         icon: Mail,
         title: "Email",
-        value: "contact@flashrend.com",
-        href: "mailto:contact@flashrend.com",
+        value: "contact@flashrend.site",
+        href: "mailto:contact@flashrend.site",
     },
     {
         icon: Phone,
@@ -72,7 +72,7 @@ export default function ContactSection() {
                 process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
                 process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
                 {
-                    to_email: "contact@flashrend.com",
+                    to_email: "contact@flashrend.site",
                     from_name: data.name,
                     from_email: data.email,
                     subject: data.subject,
