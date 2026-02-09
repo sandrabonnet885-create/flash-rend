@@ -3,6 +3,7 @@ import { Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import CookieConsent from "@/components/cookie-consent";
 import {
     ClerkProvider,
     SignInButton,
@@ -98,6 +99,7 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         {children}
+                        <CookieConsent />
                         <Toaster />
                     </ThemeProvider>
                 </body>
