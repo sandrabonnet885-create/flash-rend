@@ -125,7 +125,41 @@ export default function TermsPage() {
                     <Separator className="my-8" />
 
                     <section className="mb-10">
-                        <h2 className="text-2xl font-bold mb-4">7. Propriété intellectuelle</h2>
+                        <h2 className="text-2xl font-bold mb-4">7. Politique de remboursement</h2>
+                        <p className="text-foreground/70 leading-relaxed mb-4">
+                            FlashRend s'engage à traiter équitablement toutes les demandes de remboursement légitimes. Les utilisateurs peuvent soumettre une demande de remboursement dans les cas suivants :
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 text-foreground/70 mb-4">
+                            <li>Problème technique empêchant l'utilisation du service</li>
+                            <li>Transaction non autorisée sur votre compte</li>
+                            <li>Service non reçu conformément aux conditions</li>
+                            <li>Problème lié à un investissement spécifique</li>
+                        </ul>
+                        <p className="text-foreground/70 leading-relaxed mb-4">
+                            <strong>Procédure de demande :</strong>
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 text-foreground/70 mb-4">
+                            <li>Accédez à la section "Remboursements" de votre compte</li>
+                            <li>Remplissez le formulaire de demande en détaillant votre situation</li>
+                            <li>Fournissez toutes les informations nécessaires à l'examen de votre demande</li>
+                            <li>Notre équipe examinera votre demande sous 5-7 jours ouvrables</li>
+                        </ul>
+                        <p className="text-foreground/70 leading-relaxed mb-4">
+                            <strong>Conditions importantes :</strong>
+                        </p>
+                        <ul className="list-disc pl-6 space-y-2 text-foreground/70">
+                            <li>Le montant demandé ne peut pas dépasser votre solde disponible</li>
+                            <li>Les demandes frauduleuses peuvent entraîner la suspension du compte</li>
+                            <li>Les remboursements sont effectués vers le compte bancaire enregistré</li>
+                            <li>Un remboursement approuvé sera traité sous 3-5 jours ouvrables</li>
+                            <li>FlashRend se réserve le droit de refuser une demande si elle ne respecte pas les conditions</li>
+                        </ul>
+                    </section>
+
+                    <Separator className="my-8" />
+
+                    <section className="mb-10">
+                        <h2 className="text-2xl font-bold mb-4">8. Propriété intellectuelle</h2>
                         <p className="text-foreground/70 leading-relaxed">
                             Tous les contenus présents sur FlashRend (textes, graphiques, logos, icônes, images, clips audio, téléchargements numériques) sont la propriété de FlashRend ou de ses fournisseurs de contenu et sont protégés par les lois sur la propriété intellectuelle.
                         </p>
@@ -134,7 +168,16 @@ export default function TermsPage() {
                     <Separator className="my-8" />
 
                     <section className="mb-10">
-                        <h2 className="text-2xl font-bold mb-4">8. Limitation de responsabilité</h2>
+                        <h2 className="text-2xl font-bold mb-4">8. Propriété intellectuelle</h2>
+                        <p className="text-foreground/70 leading-relaxed">
+                            Tous les contenus présents sur FlashRend (textes, graphiques, logos, icônes, images, clips audio, téléchargements numériques) sont la propriété de FlashRend ou de ses fournisseurs de contenu et sont protégés par les lois sur la propriété intellectuelle.
+                        </p>
+                    </section>
+
+                    <Separator className="my-8" />
+
+                    <section className="mb-10">
+                        <h2 className="text-2xl font-bold mb-4">9. Limitation de responsabilité</h2>
                         <p className="text-foreground/70 leading-relaxed mb-4">
                             Dans les limites autorisées par la loi, FlashRend ne sera pas responsable des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs résultant de :
                         </p>
@@ -149,7 +192,7 @@ export default function TermsPage() {
                     <Separator className="my-8" />
 
                     <section className="mb-10">
-                        <h2 className="text-2xl font-bold mb-4">9. Résiliation</h2>
+                        <h2 className="text-2xl font-bold mb-4">10. Résiliation</h2>
                         <p className="text-foreground/70 leading-relaxed">
                             FlashRend se réserve le droit de suspendre ou de résilier votre compte à tout moment, avec ou sans préavis, en cas de violation des présentes conditions ou pour toute autre raison jugée appropriée.
                         </p>
@@ -158,7 +201,7 @@ export default function TermsPage() {
                     <Separator className="my-8" />
 
                     <section className="mb-10">
-                        <h2 className="text-2xl font-bold mb-4">10. Droit applicable</h2>
+                        <h2 className="text-2xl font-bold mb-4">11. Droit applicable</h2>
                         <p className="text-foreground/70 leading-relaxed">
                             Les présentes conditions sont régies par le droit français. Tout litige relatif à l'interprétation ou à l'exécution des présentes sera soumis aux tribunaux compétents de Paris, France.
                         </p>
@@ -167,7 +210,7 @@ export default function TermsPage() {
                     <Separator className="my-8" />
 
                     <section className="mb-10">
-                        <h2 className="text-2xl font-bold mb-4">11. Contact</h2>
+                        <h2 className="text-2xl font-bold mb-4">12. Contact</h2>
                         <p className="text-foreground/70 leading-relaxed">
                             Pour toute question concernant ces conditions d'utilisation, veuillez nous contacter à :
                         </p>

@@ -10,6 +10,7 @@ import {
     BarChart3,
     CreditCard,
     Eye,
+    RefreshCcw,
 } from "lucide-react";
 import {
     SidebarMenu,
@@ -65,6 +66,20 @@ const menuItems = [
             {
                 title: "Historique",
                 href: "/account/payments/history",
+            },
+        ],
+    },
+    {
+        title: "Remboursements",
+        icon: RefreshCcw,
+        items: [
+            {
+                title: "Nouvelle demande",
+                href: "/account/refund",
+            },
+            {
+                title: "Historique",
+                href: "/account/refund/history",
             },
         ],
     },

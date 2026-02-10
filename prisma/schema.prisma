@@ -7,18 +7,19 @@ datasource db {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  clerkId       String        @unique
-  email         String        @unique
+  id            String          @id @default(cuid())
+  clerkId       String          @unique
+  email         String          @unique
   firstName     String?
   lastName      String?
-  balance       Float         @default(0)
-  bonusClaimed  Boolean       @default(false)
+  balance       Float           @default(0)
+  bonusClaimed  Boolean         @default(false)
   transactions  Transaction[]
   bankAccounts  BankAccount[]
   investments   Investment[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  refundRequests RefundRequest[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Investment {
@@ -41,6 +42,31 @@ enum InvestmentState {
   COMPLETED
   CLOSED
 }
+
+model RefundRequest {
+  id              String              @id @default(cuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id])
+  amount          Float
+  reason          String
+  description     String?
+  status          RefundRequestStatus @default(PENDING)
+  adminResponse   String?
+  processedAt     DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum RefundRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+}
+
 model Transaction {
   id              String        @id @default(cuid())
   userId          String
