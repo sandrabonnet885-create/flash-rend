@@ -156,20 +156,20 @@ export default function AdminDashboardPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-950 p-6">
+        <div className="min-h-screen bg-slate-950 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                        <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
                             Dashboard Admin
                         </h1>
-                        <p className="text-foreground/60 mt-1">
+                        <p className="text-foreground/60 mt-1 text-sm">
                             Vue d'ensemble des activités et statistiques
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <p className="text-sm text-foreground/60">
+                        <p className="text-xs sm:text-sm text-foreground/60 hidden sm:block">
                             Dernière mise à jour:{" "}
                             {lastRefresh.toLocaleTimeString("fr-FR")}
                         </p>
@@ -180,9 +180,9 @@ export default function AdminDashboardPage() {
                             size="sm"
                         >
                             <RefreshCcw
-                                className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
+                                className={`h-4 w-4 sm:mr-2 ${isLoading ? "animate-spin" : ""}`}
                             />
-                            Actualiser
+                            <span className="hidden sm:inline">Actualiser</span>
                         </Button>
                     </div>
                 </div>
@@ -408,12 +408,12 @@ export default function AdminDashboardPage() {
                                 {activities.transactions.slice(0, 5).map((transaction) => (
                                     <div
                                         key={transaction.id}
-                                        className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-muted/30 rounded-lg"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <Activity className="h-4 w-4 text-foreground/60" />
-                                            <div>
-                                                <p className="text-sm font-medium">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <Activity className="h-4 w-4 text-foreground/60 flex-shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">
                                                     {transaction.user.email}
                                                 </p>
                                                 <p className="text-xs text-foreground/60">
@@ -424,7 +424,7 @@ export default function AdminDashboardPage() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right">
                                             <p className="text-sm font-semibold">
                                                 {transaction.amount.toFixed(2)}€
                                             </p>
