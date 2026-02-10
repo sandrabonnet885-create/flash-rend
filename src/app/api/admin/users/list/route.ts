@@ -20,22 +20,27 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const refunds = await prisma.refundRequest.findMany({
+        const users = await prisma.user.findMany({
             orderBy: { createdAt: "desc" },
             include: {
-                user: {
+                _count: {
                     select: {
-                        email: true,
-                        firstName: true,
-                        lastName: true,
+                        investments: true,
+                        transactions: true,
                     },
                 },
             },
         });
 
-        return NextResponse.json({ refunds });
+        const stats = {
+            total: users.length,
+            totalBalance: users.reduce((sum, u) => sum + u.balance, 0),
+            activeInvestors: users.filter((u) => u._count.investments > 0).length,
+        };
+
+        return NextResponse.json({ users, stats });
     } catch (error) {
-        console.error("Error fetching refunds:", error);
+        console.error("Error fetching users:", error);
         return NextResponse.json(
             { error: "Erreur serveur" },
             { status: 500 }

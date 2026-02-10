@@ -2,14 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
-async function isAdmin(userId: string): Promise<boolean> {
-    return true; // TODO: Implémenter la vérification admin
+const ADMIN_EMAILS = ["hermannrichy15@gmail.com", "danielmore12@icloud.com"];
+
+async function isAdmin(userEmail: string | null): Promise<boolean> {
+    if (!userEmail) return false;
+    return ADMIN_EMAILS.includes(userEmail);
 }
 
 export async function GET(request: NextRequest) {
     try {
         const user = await currentUser();
-        if (!user || !(await isAdmin(user.id))) {
+        const userEmail = user?.emailAddresses[0]?.emailAddress ?? null;
+        if (!user || !(await isAdmin(userEmail))) {
             return NextResponse.json(
                 { error: "Non autorisé" },
                 { status: 403 }

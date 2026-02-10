@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
-// TODO: Ajouter une vérification des permissions admin
-async function isAdmin(userId: string): Promise<boolean> {
-    // Pour l'instant, retourne true
-    // À implémenter: vérifier si l'utilisateur a le rôle admin
-    return true;
+const ADMIN_EMAILS = ["hermannrichy15@gmail.com", "danielmore12@icloud.com"];
+
+async function isAdmin(userEmail: string | null): Promise<boolean> {
+    if (!userEmail) return false;
+    return ADMIN_EMAILS.includes(userEmail);
 }
 
 export async function GET(request: NextRequest) {
@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
         }
 
         // Vérifier les permissions admin
-        const adminCheck = await isAdmin(user.id);
+        const userEmail = user.emailAddresses[0]?.emailAddress ?? null;
+        const adminCheck = await isAdmin(userEmail);
         if (!adminCheck) {
             return NextResponse.json(
                 { error: "Accès non autorisé" },

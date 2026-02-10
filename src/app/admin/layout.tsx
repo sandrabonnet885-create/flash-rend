@@ -1,8 +1,9 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
     LayoutDashboard,
@@ -12,8 +13,11 @@ import {
     RefreshCcw,
     Settings,
     ArrowLeft,
+    Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const ADMIN_EMAILS = ["hermannrichy15@gmail.com", "danielmore12@icloud.com"];
 
 const adminMenuItems = [
     {
@@ -41,15 +45,38 @@ const adminMenuItems = [
         icon: RefreshCcw,
         href: "/admin/refunds",
     },
-    {
+    /*{
         title: "Paramètres",
         icon: Settings,
         href: "/admin/settings",
-    },
+    },*/
 ];
+
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, isLoaded } = useUser();
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    useEffect(() => {
+        if (isLoaded) {
+            const userEmail = user?.emailAddresses[0]?.emailAddress;
+            if (!userEmail || !ADMIN_EMAILS.includes(userEmail)) {
+                router.push("/account");
+            } else {
+                setIsAuthorized(true);
+            }
+        }
+    }, [isLoaded, user, router]);
+
+    if (!isLoaded || !isAuthorized) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-slate-950">
+                <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-screen bg-slate-950">

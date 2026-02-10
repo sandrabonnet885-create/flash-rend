@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const refunds = await prisma.refundRequest.findMany({
+        const investments = await prisma.investment.findMany({
             orderBy: { createdAt: "desc" },
             include: {
                 user: {
@@ -33,9 +33,16 @@ export async function GET(request: NextRequest) {
             },
         });
 
-        return NextResponse.json({ refunds });
+        const stats = {
+            total: investments.length,
+            active: investments.filter((i) => i.status === "ACTIVE").length,
+            totalAmount: investments.reduce((sum, i) => sum + i.amount, 0),
+            totalReturns: investments.reduce((sum, i) => sum + i.potentialReturn, 0),
+        };
+
+        return NextResponse.json({ investments, stats });
     } catch (error) {
-        console.error("Error fetching refunds:", error);
+        console.error("Error fetching investments:", error);
         return NextResponse.json(
             { error: "Erreur serveur" },
             { status: 500 }
