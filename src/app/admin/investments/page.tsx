@@ -28,8 +28,9 @@ type Investment = {
     duration: number;
     potentialReturn: number;
     status: "ACTIVE" | "COMPLETED" | "CANCELLED";
-    startDate: Date;
-    endDate: Date;
+    startDate: Date | null;
+    endDate: Date | null;
+    createdAt: Date;
     user: {
         email: string;
         firstName: string | null;
@@ -198,11 +199,17 @@ export default function AdminInvestmentsPage() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            {format(
-                                                new Date(investment.startDate),
-                                                "dd MMM yyyy HH:mm",
-                                                { locale: fr }
-                                            )}
+                                            {investment.startDate && !isNaN(new Date(investment.startDate).getTime())
+                                                ? format(
+                                                      new Date(investment.startDate),
+                                                      "dd MMM yyyy HH:mm",
+                                                      { locale: fr }
+                                                  )
+                                                : format(
+                                                      new Date(investment.createdAt),
+                                                      "dd MMM yyyy HH:mm",
+                                                      { locale: fr }
+                                                  )}
                                         </TableCell>
                                         <TableCell>{investment.duration}h</TableCell>
                                         <TableCell className="text-right font-semibold">
