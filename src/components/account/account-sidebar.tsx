@@ -57,7 +57,7 @@ const menuItems = [
         items: [
             {
                 title: "Dépôts",
-                href: "/account/payments/deposits",
+                href: "/account/deposit/bank-transfer",
             },
             {
                 title: "Retraits",

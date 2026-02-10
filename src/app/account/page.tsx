@@ -152,6 +152,29 @@ export default async function AccountPage() {
                             Dépôt
                         </CardTitle>
                         <CardDescription>
+                            Ajouter des fonds par virement bancaire
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link href="/account/deposit/bank-transfer">
+                            <Button
+                                variant="outline"
+                                className="w-full border-white/20 hover:bg-white/10"
+                            >
+                                Effectuer un dépôt
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                {/* Stripe Payment - Commented out */}
+                {/* <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <ArrowDownLeft className="h-5 w-5 text-green-500" />
+                            Dépôt Stripe
+                        </CardTitle>
+                        <CardDescription>
                             Ajouter des fonds à votre compte
                         </CardDescription>
                     </CardHeader>
@@ -165,7 +188,7 @@ export default async function AccountPage() {
                             </Button>
                         </Link>
                     </CardContent>
-                </Card>
+                </Card> */}
 
                  <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
                     <CardHeader>
