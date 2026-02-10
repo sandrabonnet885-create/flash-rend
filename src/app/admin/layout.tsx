@@ -43,6 +43,11 @@ const adminMenuItems = [
         href: "/admin/transactions",
     },
     {
+        title: "Virements bancaires",
+        icon: TrendingUp,
+        href: "/admin/bank-transfers",
+    },
+    {
         title: "Remboursements",
         icon: RefreshCcw,
         href: "/admin/refunds",

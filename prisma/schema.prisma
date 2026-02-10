@@ -18,6 +18,7 @@ model User {
   bankAccounts  BankAccount[]
   investments   Investment[]
   refundRequests RefundRequest[]
+  bankTransferDeposits BankTransferDeposit[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 }
@@ -65,6 +66,43 @@ enum RefundRequestStatus {
   APPROVED
   REJECTED
   PROCESSING
+}
+
+model BankTransferDeposit {
+  id              String                    @id @default(cuid())
+  userId          String
+  user            User                      @relation(fields: [userId], references: [id])
+  amount          Float
+  reference       String                    // ID transaction fourni par l'utilisateur
+  transferDate    DateTime                  // Date du virement
+  status          BankTransferDepositStatus @default(PENDING)
+  proofUrl        String?                   // URL de la preuve de virement
+  adminNote       String?                   // Note de l'admin
+  processedBy     String?                   // Email de l'admin qui a traité
+  processedAt     DateTime?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum BankTransferDepositStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model BankTransferSettings {
+  id              String   @id @default(cuid())
+  accountHolder   String
+  iban            String
+  bic             String
+  bankName        String
+  instructions    String?  // Instructions personnalisées
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Transaction {
