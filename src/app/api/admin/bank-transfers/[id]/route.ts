@@ -11,7 +11,7 @@ async function isAdmin(userEmail: string | null): Promise<boolean> {
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = await currentUser();
@@ -23,7 +23,7 @@ export async function PATCH(
             );
         }
 
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
         const { status, adminNote } = body;
 
