@@ -73,7 +73,7 @@ export async function sendWelcomeEmail(user: User) {
                             </ul>
                             
                             <p style="text-align: center;">
-                                <a href="https://flashrend.com/account" class="button">Accéder à mon compte</a>
+                                <a href="https://flashrend.site/account" class="button">Accéder à mon compte</a>
                             </p>
                             
                             <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
@@ -197,7 +197,7 @@ export async function sendDepositApprovedEmail(user: User, deposit: Deposit) {
                             <p>Vous pouvez maintenant utiliser ces fonds pour lancer vos investissements !</p>
                             
                             <p style="text-align: center;">
-                                <a href="https://flashrend.com/account/investments" class="button">Commencer à investir</a>
+                                <a href="https://flashrend.site/account/investments" class="button">Commencer à investir</a>
                             </p>
                             
                             <p>Bonne chance dans vos investissements ! 🚀</p>
@@ -314,7 +314,7 @@ export async function sendAdminDepositNotification(user: User, deposit: Deposit)
                             </div>
                             
                             <p style="text-align: center;">
-                                <a href="https://flashrend.com/admin/bank-transfers" class="button">Gérer les dépôts</a>
+                                <a href="https://flashrend.site/admin/bank-transfers" class="button">Gérer les dépôts</a>
                             </p>
                         </div>
                         <div class="footer">
@@ -373,7 +373,7 @@ export async function sendInvestmentCreatedEmail(user: User, investment: Investm
                             <p>Vous recevrez un email lorsque votre investissement sera terminé et que les fonds seront crédités sur votre compte.</p>
                             
                             <p style="text-align: center;">
-                                <a href="https://flashrend.com/account/investments/performance" class="button">Suivre mes investissements</a>
+                                <a href="https://flashrend.site/account/investments/performance" class="button">Suivre mes investissements</a>
                             </p>
                             
                             <p>Bonne chance ! 🚀</p>
@@ -437,7 +437,7 @@ export async function sendInvestmentCompletedEmail(user: User, investment: Inves
                             <p>Vous pouvez maintenant réinvestir ces fonds ou demander un retrait !</p>
                             
                             <p style="text-align: center;">
-                                <a href="https://flashrend.com/account" class="button">Voir mon compte</a>
+                                <a href="https://flashrend.site/account" class="button">Voir mon compte</a>
                             </p>
                             
                             <p>Merci de votre confiance ! 🚀</p>
@@ -455,5 +455,231 @@ export async function sendInvestmentCompletedEmail(user: User, investment: Inves
         console.log(`Investment completed email sent to ${user.email}`);
     } catch (error) {
         console.error("Error sending investment completed email:", error);
+    }
+}
+
+// Retrait demandé - Email utilisateur
+export async function sendWithdrawalRequestedEmail(user: User, withdrawal: Withdrawal) {
+    try {
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to: user.email,
+            subject: "Demande de retrait en cours de traitement 💸",
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .info-box { background: white; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Demande de retrait reçue !</h1>
+                        </div>
+                        <div class="content">
+                            <p>Bonjour ${user.firstName || ""}${user.firstName && user.lastName ? " " + user.lastName : ""},</p>
+                            
+                            <p>Nous avons bien reçu votre demande de retrait.</p>
+                            
+                            <div class="info-box">
+                                <p><strong>Montant :</strong> ${withdrawal.amount.toFixed(2)}€</p>
+                            </div>
+                            
+                            <p>Votre demande est en cours de vérification par notre équipe. Vous recevrez un email de confirmation dès que le retrait sera traité.</p>
+                            
+                            <p><strong>Délai de traitement :</strong> généralement sous 24-48h ouvrées.</p>
+                            
+                            <p>Merci de votre confiance !</p>
+                            
+                            <p>L'équipe FlashRend</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 FlashRend. Tous droits réservés.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+        });
+        console.log(`Withdrawal requested email sent to ${user.email}`);
+    } catch (error) {
+        console.error("Error sending withdrawal requested email:", error);
+    }
+}
+
+// Retrait approuvé - Email utilisateur
+export async function sendWithdrawalApprovedEmail(user: User, withdrawal: Withdrawal) {
+    try {
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to: user.email,
+            subject: "Retrait approuvé - En cours de traitement ✅",
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .info-box { background: white; padding: 20px; border-left: 4px solid #10b981; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>✅ Retrait approuvé !</h1>
+                        </div>
+                        <div class="content">
+                            <p>Bonjour ${user.firstName || ""}${user.firstName && user.lastName ? " " + user.lastName : ""},</p>
+                            
+                            <p>Excellente nouvelle ! Votre demande de retrait a été approuvée.</p>
+                            
+                            <div class="info-box">
+                                <p><strong>Montant :</strong> ${withdrawal.amount.toFixed(2)}€</p>
+                            </div>
+                            
+                            ${withdrawal.adminNote ? `<p><strong>Note de l'administrateur :</strong> ${withdrawal.adminNote}</p>` : ""}
+                            
+                            <p>Le virement sera effectué sous 2-5 jours ouvrés vers votre compte bancaire enregistré.</p>
+                            
+                            <p>Merci de votre confiance !</p>
+                            
+                            <p>L'équipe FlashRend</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 FlashRend. Tous droits réservés.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+        });
+        console.log(`Withdrawal approved email sent to ${user.email}`);
+    } catch (error) {
+        console.error("Error sending withdrawal approved email:", error);
+    }
+}
+
+// Retrait rejeté - Email utilisateur
+export async function sendWithdrawalRejectedEmail(user: User, withdrawal: Withdrawal) {
+    try {
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to: user.email,
+            subject: "Demande de retrait refusée ❌",
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .info-box { background: white; padding: 20px; border-left: 4px solid #ef4444; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Demande de retrait refusée</h1>
+                        </div>
+                        <div class="content">
+                            <p>Bonjour ${user.firstName || ""}${user.firstName && user.lastName ? " " + user.lastName : ""},</p>
+                            
+                            <p>Malheureusement, votre demande de retrait n'a pas pu être validée.</p>
+                            
+                            <div class="info-box">
+                                <p><strong>Montant :</strong> ${withdrawal.amount.toFixed(2)}€</p>
+                            </div>
+                            
+                            ${withdrawal.adminNote ? `<p><strong>Raison :</strong> ${withdrawal.adminNote}</p>` : ""}
+                            
+                            <p>Les fonds ont été recrédités sur votre compte FlashRend.</p>
+                            
+                            <p>Si vous pensez qu'il s'agit d'une erreur ou si vous avez des questions, n'hésitez pas à nous contacter.</p>
+                            
+                            <p>Cordialement,</p>
+                            <p>L'équipe FlashRend</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 FlashRend. Tous droits réservés.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+        });
+        console.log(`Withdrawal rejected email sent to ${user.email}`);
+    } catch (error) {
+        console.error("Error sending withdrawal rejected email:", error);
+    }
+}
+
+// Notification admin - Nouveau retrait
+export async function sendAdminWithdrawalNotification(user: User, withdrawal: Withdrawal) {
+    try {
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to: ADMIN_EMAILS,
+            subject: `🔔 Nouvelle demande de retrait - ${withdrawal.amount.toFixed(2)}€`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .info-box { background: white; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; }
+                        .button { display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🔔 Nouvelle demande de retrait</h1>
+                        </div>
+                        <div class="content">
+                            <p>Une nouvelle demande de retrait a été soumise.</p>
+                            
+                            <div class="info-box">
+                                <p><strong>Utilisateur :</strong> ${user.firstName || ""} ${user.lastName || ""} (${user.email})</p>
+                                <p><strong>Montant :</strong> ${withdrawal.amount.toFixed(2)}€</p>
+                                <p><strong>ID du retrait :</strong> ${withdrawal.id}</p>
+                            </div>
+                            
+                            <p style="text-align: center;">
+                                <a href="https://flashrend.site/admin/transactions" class="button">Gérer les retraits</a>
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 FlashRend - Notification Admin</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+        });
+        console.log(`Admin withdrawal notification sent`);
+    } catch (error) {
+        console.error("Error sending admin withdrawal notification:", error);
     }
 }

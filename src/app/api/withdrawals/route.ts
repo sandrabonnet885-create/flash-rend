@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { sendWithdrawalRequestedEmail, sendAdminWithdrawalNotification } from "@/lib/email";
 
 export async function POST(req: Request) {
     try {
@@ -64,6 +65,36 @@ export async function POST(req: Request) {
 
             return transaction;
         });
+
+        // Envoyer les emails de notification
+        try {
+            await sendWithdrawalRequestedEmail(
+                {
+                    email: dbUser.email,
+                    firstName: dbUser.firstName,
+                    lastName: dbUser.lastName,
+                },
+                {
+                    id: result.id,
+                    amount: result.amount,
+                }
+            );
+
+            await sendAdminWithdrawalNotification(
+                {
+                    email: dbUser.email,
+                    firstName: dbUser.firstName,
+                    lastName: dbUser.lastName,
+                },
+                {
+                    id: result.id,
+                    amount: result.amount,
+                }
+            );
+        } catch (emailError) {
+            console.error("Error sending withdrawal emails:", emailError);
+            // Continue même si l'email échoue
+        }
 
         return NextResponse.json(result);
     } catch (error) {

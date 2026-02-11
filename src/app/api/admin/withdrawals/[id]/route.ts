@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { sendWithdrawalApprovedEmail, sendWithdrawalRejectedEmail } from "@/lib/email";
 
 const ADMIN_EMAILS = ["hermannrichy15@gmail.com", "danielmore12@icloud.com"];
 
@@ -20,7 +21,8 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        const { status } = await req.json();
+        const body = await req.json();
+        const { status, adminNote } = body;
 
         if (!["COMPLETED", "FAILED"].includes(status)) {
             return new NextResponse("Invalid status", { status: 400 });
@@ -61,6 +63,30 @@ export async function PATCH(
                     data: { balance: currentBalance + transaction.amount },
                 });
             });
+        }
+
+        // Envoyer l'email de notification
+        try {
+            const userInfo = {
+                email: transaction.user.email,
+                firstName: transaction.user.firstName,
+                lastName: transaction.user.lastName,
+            };
+
+            const withdrawalInfo = {
+                id: transaction.id,
+                amount: transaction.amount,
+                adminNote: adminNote || null,
+            };
+
+            if (status === "COMPLETED") {
+                await sendWithdrawalApprovedEmail(userInfo, withdrawalInfo);
+            } else {
+                await sendWithdrawalRejectedEmail(userInfo, withdrawalInfo);
+            }
+        } catch (emailError) {
+            console.error("Error sending withdrawal status email:", emailError);
+            // Continue même si l'email échoue
         }
 
         return NextResponse.json({ success: true });
