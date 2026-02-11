@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const ADMIN_EMAILS = ["hermannrichy15@gmail.com", "danielmore12@icloud.com"];
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "contact@flashrend.com";
+const FROM_EMAIL = `FlashRend Team <${process.env.RESEND_FROM_EMAIL || "contact@flashrend.site"}>`;
 
 type User = {
     email: string;
