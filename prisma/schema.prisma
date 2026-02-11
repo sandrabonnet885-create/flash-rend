@@ -14,6 +14,7 @@ model User {
   lastName      String?
   balance       Float           @default(0)
   bonusClaimed  Boolean         @default(false)
+  welcomeEmailSent Boolean      @default(false)
   transactions  Transaction[]
   bankAccounts  BankAccount[]
   investments   Investment[]

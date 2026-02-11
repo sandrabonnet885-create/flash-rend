@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
+import { sendDepositApprovedEmail, sendDepositRejectedEmail } from "@/lib/email";
 
 const ADMIN_EMAILS = ["hermannrichy15@gmail.com", "danielmore12@icloud.com"];
 
@@ -86,6 +87,32 @@ export async function PATCH(
                     reference: `BANK_TRANSFER_${deposit.id}`,
                 },
             });
+        }
+
+        // Envoyer l'email de notification
+        try {
+            const userInfo = {
+                email: deposit.user.email,
+                firstName: deposit.user.firstName,
+                lastName: deposit.user.lastName,
+            };
+
+            const depositInfo = {
+                id: deposit.id,
+                amount: deposit.amount,
+                reference: deposit.reference,
+                transferDate: deposit.transferDate,
+                adminNote: adminNote || null,
+            };
+
+            if (status === "APPROVED") {
+                await sendDepositApprovedEmail(userInfo, depositInfo);
+            } else {
+                await sendDepositRejectedEmail(userInfo, depositInfo);
+            }
+        } catch (emailError) {
+            console.error("Error sending deposit status email:", emailError);
+            // Continue même si l'email échoue
         }
 
         return NextResponse.json({

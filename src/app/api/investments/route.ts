@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { sendInvestmentCreatedEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
     try {
@@ -69,6 +70,27 @@ export async function POST(req: Request) {
 
             return newInvestment;
         });
+
+        // Envoyer l'email de notification
+        try {
+            await sendInvestmentCreatedEmail(
+                {
+                    email: dbUser.email,
+                    firstName: dbUser.firstName,
+                    lastName: dbUser.lastName,
+                },
+                {
+                    id: investment.id,
+                    amount: investment.amount,
+                    multiplier: investment.multiplier,
+                    potentialReturn: investment.potentialReturn,
+                    endsAt: investment.endsAt,
+                }
+            );
+        } catch (emailError) {
+            console.error("Error sending investment created email:", emailError);
+            // Continue même si l'email échoue
+        }
 
         return NextResponse.json(investment);
     } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
+import { sendDepositSubmittedEmail, sendAdminDepositNotification } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
     try {
@@ -60,6 +61,40 @@ export async function POST(request: NextRequest) {
                 status: "PENDING",
             },
         });
+
+        // Envoyer les emails de notification
+        try {
+            await sendDepositSubmittedEmail(
+                {
+                    email: dbUser.email,
+                    firstName: dbUser.firstName,
+                    lastName: dbUser.lastName,
+                },
+                {
+                    id: deposit.id,
+                    amount: deposit.amount,
+                    reference: deposit.reference,
+                    transferDate: deposit.transferDate,
+                }
+            );
+
+            await sendAdminDepositNotification(
+                {
+                    email: dbUser.email,
+                    firstName: dbUser.firstName,
+                    lastName: dbUser.lastName,
+                },
+                {
+                    id: deposit.id,
+                    amount: deposit.amount,
+                    reference: deposit.reference,
+                    transferDate: deposit.transferDate,
+                }
+            );
+        } catch (emailError) {
+            console.error("Error sending deposit emails:", emailError);
+            // Continue même si l'email échoue
+        }
 
         return NextResponse.json({
             success: true,
