@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { amount, reference, transferDate, proofUrl } = body;
+        const { amount, reference, transferDate, proofImageUrl } = body;
 
         // Validation
         if (!amount || amount <= 0) {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
                 amount: parseFloat(amount),
                 reference: reference.trim(),
                 transferDate: new Date(transferDate),
-                proofUrl: proofUrl || null,
+                proofImageUrl: proofImageUrl || null,
                 status: "PENDING",
             },
         });

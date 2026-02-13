@@ -26,11 +26,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Check, X, ExternalLink, TrendingUp, Clock, DollarSign } from "lucide-react";
+import { Loader2, Check, X, Eye, TrendingUp, Clock, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type Deposit = {
     id: string;
@@ -38,7 +39,7 @@ type Deposit = {
     reference: string;
     transferDate: Date;
     status: "PENDING" | "APPROVED" | "REJECTED";
-    proofUrl: string | null;
+    proofImageUrl: string | null;
     adminNote: string | null;
     createdAt: Date;
     user: {
@@ -77,6 +78,8 @@ export default function AdminBankTransfersPage() {
     const [selectedDeposit, setSelectedDeposit] = useState<Deposit | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [adminNote, setAdminNote] = useState("");
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [imageToPreview, setImageToPreview] = useState<string | null>(null);
 
     useEffect(() => {
         fetchDeposits();
@@ -311,18 +314,21 @@ export default function AdminBankTransfersPage() {
                                 </div>
                             </div>
 
-                            {selectedDeposit.proofUrl && (
+                            {selectedDeposit.proofImageUrl && (
                                 <div>
                                     <p className="text-sm text-foreground/60 mb-2">Preuve de virement</p>
-                                    <a
-                                        href={selectedDeposit.proofUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-sm text-amber-500 hover:underline flex items-center gap-1"
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            setImageToPreview(selectedDeposit.proofImageUrl);
+                                            setShowImageModal(true);
+                                        }}
+                                        className="gap-2"
                                     >
-                                        Voir la preuve
-                                        <ExternalLink className="h-3 w-3" />
-                                    </a>
+                                        <Eye className="h-4 w-4" />
+                                        Voir la capture
+                                    </Button>
                                 </div>
                             )}
 
@@ -380,6 +386,28 @@ export default function AdminBankTransfersPage() {
                                     <p className="text-sm">{selectedDeposit.adminNote}</p>
                                 </div>
                             )}
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Image Preview Modal */}
+            <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+                <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                        <DialogTitle>Preuve de virement</DialogTitle>
+                        <DialogDescription>
+                            Capture d'écran du virement bancaire
+                        </DialogDescription>
+                    </DialogHeader>
+                    {imageToPreview && (
+                        <div className="relative w-full h-[600px] bg-slate-900 rounded-lg overflow-hidden">
+                            <Image
+                                src={imageToPreview}
+                                alt="Preuve de virement"
+                                fill
+                                className="object-contain"
+                            />
                         </div>
                     )}
                 </DialogContent>

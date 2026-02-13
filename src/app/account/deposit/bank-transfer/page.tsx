@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Copy, Check, ArrowLeft, AlertCircle } from "lucide-react";
+import { Loader2, Copy, Check, ArrowLeft, AlertCircle, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
 
 type BankSettings = {
     accountHolder: string;
@@ -23,13 +24,16 @@ export default function BankTransferDepositPage() {
     const [settings, setSettings] = useState<BankSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [copiedField, setCopiedField] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         amount: "",
         reference: "",
         transferDate: new Date().toISOString().split("T")[0],
-        proofUrl: "",
+        proofImageUrl: "",
     });
 
     useEffect(() => {
@@ -58,15 +62,91 @@ export default function BankTransferDepositPage() {
         setTimeout(() => setCopiedField(null), 2000);
     };
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Valider le type
+        if (!file.type.startsWith("image/")) {
+            toast.error("Le fichier doit être une image");
+            return;
+        }
+
+        // Valider la taille (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("L'image est trop volumineuse (max 5MB)");
+            return;
+        }
+
+        setSelectedFile(file);
+        
+        // Créer une prévisualisation
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPreviewUrl(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const removeFile = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setFormData({ ...formData, proofImageUrl: "" });
+    };
+
+    const uploadFile = async (): Promise<string | null> => {
+        if (!selectedFile) return null;
+
+        setIsUploading(true);
+        try {
+            const uploadFormData = new FormData();
+            uploadFormData.append("file", selectedFile);
+
+            const response = await fetch("/api/upload", {
+                method: "POST",
+                body: uploadFormData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                return data.url;
+            } else {
+                toast.error(data.error || "Erreur lors de l'upload");
+                return null;
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            toast.error("Erreur lors de l'upload");
+            return null;
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
+            // Upload de l'image si présente
+            let proofImageUrl = formData.proofImageUrl;
+            if (selectedFile) {
+                const uploadedUrl = await uploadFile();
+                if (!uploadedUrl) {
+                    setIsSubmitting(false);
+                    return;
+                }
+                proofImageUrl = uploadedUrl;
+            }
+
             const response = await fetch("/api/deposit/bank-transfer/submit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    proofImageUrl,
+                }),
             });
 
             const data = await response.json();
@@ -250,21 +330,55 @@ export default function BankTransferDepositPage() {
                             />
                         </div>
 
-                        {/*<div className="space-y-2">
-                            <Label htmlFor="proofUrl">Preuve de virement (optionnel)</Label>
-                            <Input
-                                id="proofUrl"
-                                type="url"
-                                placeholder="https://..."
-                                value={formData.proofUrl}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, proofUrl: e.target.value })
-                                }
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="proofImage">Preuve de virement (capture d'écran)</Label>
+                            {!previewUrl ? (
+                                <div className="border-2 border-dashed border-foreground/20 rounded-lg p-6 text-center hover:border-amber-500/50 transition-colors">
+                                    <input
+                                        id="proofImage"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileSelect}
+                                        className="hidden"
+                                    />
+                                    <label
+                                        htmlFor="proofImage"
+                                        className="cursor-pointer flex flex-col items-center gap-2"
+                                    >
+                                        <Upload className="h-8 w-8 text-foreground/40" />
+                                        <p className="text-sm text-foreground/60">
+                                            Cliquez pour sélectionner une image
+                                        </p>
+                                        <p className="text-xs text-foreground/40">
+                                            PNG, JPG, WEBP (max 5MB)
+                                        </p>
+                                    </label>
+                                </div>
+                            ) : (
+                                <div className="relative border rounded-lg overflow-hidden">
+                                    <div className="relative w-full h-48">
+                                        <Image
+                                            src={previewUrl}
+                                            alt="Prévisualisation"
+                                            fill
+                                            className="object-contain bg-slate-900"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute top-2 right-2"
+                                        onClick={removeFile}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            )}
                             <p className="text-xs text-foreground/60">
-                                URL d'une capture d'écran de votre virement (optionnel)
+                                Capture d'écran de votre virement bancaire (optionnel)
                             </p>
-                        </div>*/}
+                        </div>
 
                         <div className="flex gap-3 pt-4">
                             <Button
@@ -277,13 +391,13 @@ export default function BankTransferDepositPage() {
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || isUploading}
                                 className="flex-1"
                             >
-                                {isSubmitting ? (
+                                {isSubmitting || isUploading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Envoi...
+                                        {isUploading ? "Upload..." : "Envoi..."}
                                     </>
                                 ) : (
                                     "Soumettre"

@@ -77,7 +77,7 @@ model BankTransferDeposit {
   reference       String                    // ID transaction fourni par l'utilisateur
   transferDate    DateTime                  // Date du virement
   status          BankTransferDepositStatus @default(PENDING)
-  proofUrl        String?                   // URL de la preuve de virement
+  proofImageUrl   String?                   // URL de la capture d'écran sur Vercel Blob
   adminNote       String?                   // Note de l'admin
   processedBy     String?                   // Email de l'admin qui a traité
   processedAt     DateTime?
