@@ -184,12 +184,12 @@ export default function BankTransferDepositPage() {
                             </Button>
                         </div>
 
-                        <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                         {/*<div className="flex items-center justify-between p-3 bg-background rounded-lg border">
                             <div>
                                 <p className="text-xs text-foreground/60">Banque</p>
                                 <p className="font-semibold">{settings.bankName}</p>
                             </div>
-                        </div>
+                        </div>*/}
                     </div>
                 </CardContent>
             </Card>
@@ -250,7 +250,7 @@ export default function BankTransferDepositPage() {
                             />
                         </div>
 
-                        <div className="space-y-2">
+                        {/*<div className="space-y-2">
                             <Label htmlFor="proofUrl">Preuve de virement (optionnel)</Label>
                             <Input
                                 id="proofUrl"
@@ -264,7 +264,7 @@ export default function BankTransferDepositPage() {
                             <p className="text-xs text-foreground/60">
                                 URL d'une capture d'écran de votre virement (optionnel)
                             </p>
-                        </div>
+                        </div>*/}
 
                         <div className="flex gap-3 pt-4">
                             <Button
