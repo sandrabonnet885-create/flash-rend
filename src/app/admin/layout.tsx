@@ -52,6 +52,11 @@ const adminMenuItems = [
         icon: RefreshCcw,
         href: "/admin/refunds",
     },
+    {
+        title: "Infos banque",
+        icon: RefreshCcw,
+        href: "/admin/settings/bank-info",
+    },
 ];
 
 
