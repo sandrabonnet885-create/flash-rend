@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Copy, Check, ArrowLeft, AlertCircle, Upload, X } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
 import Image from "next/image";
 
 type BankSettings = {
@@ -184,12 +183,12 @@ export default function BankTransferDepositPage() {
     return (
         <div className="container max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
             <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/account">
-                        <span>
-                            <ArrowLeft className="h-5 w-5" />
-                        </span>
-                    </Link>
+                <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => router.push("/account")}
+                >
+                    <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Dépôt par virement bancaire</h1>
@@ -412,10 +411,11 @@ export default function BankTransferDepositPage() {
 
             {/* Lien vers l'historique */}
             <div className="text-center">
-                <Button variant="link" asChild>
-                    <Link href="/account/deposit/bank-transfer/history">
-                        Voir l'historique de mes dépôts
-                    </Link>
+                <Button 
+                    variant="link"
+                    onClick={() => router.push("/account/deposit/bank-transfer/history")}
+                >
+                    Voir l'historique de mes dépôts
                 </Button>
             </div>
         </div>

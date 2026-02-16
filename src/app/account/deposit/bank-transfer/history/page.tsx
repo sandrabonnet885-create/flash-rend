@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Deposit = {
     id: string;
@@ -37,6 +37,7 @@ const STATUS_CONFIG = {
 };
 
 export default function BankTransferHistoryPage() {
+    const router = useRouter();
     const [deposits, setDeposits] = useState<Deposit[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -69,12 +70,12 @@ export default function BankTransferHistoryPage() {
     return (
         <div className="container max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
             <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/account/deposit/bank-transfer">
-                        <span>
-                            <ArrowLeft className="h-5 w-5" />
-                        </span>
-                    </Link>
+                <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => router.push("/account/deposit/bank-transfer")}
+                >
+                    <ArrowLeft className="h-5 w-5" />
                 </Button>
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Historique des virements</h1>
@@ -88,10 +89,11 @@ export default function BankTransferHistoryPage() {
                 <Card>
                     <CardContent className="py-12 text-center">
                         <p className="text-foreground/60">Aucun dépôt par virement pour le moment</p>
-                        <Button className="mt-4" asChild>
-                            <Link href="/account/deposit/bank-transfer">
-                                Effectuer un dépôt
-                            </Link>
+                        <Button 
+                            className="mt-4"
+                            onClick={() => router.push("/account/deposit/bank-transfer")}
+                        >
+                            Effectuer un dépôt
                         </Button>
                     </CardContent>
                 </Card>
