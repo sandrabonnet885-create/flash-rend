@@ -13,6 +13,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import AccountSidebar from "@/components/account/account-sidebar";
 import UserMenu from "@/components/account/user-menu";
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
     return (
@@ -26,7 +28,11 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                                 FlashRend
                             </h2>
                             {/* Close button for mobile */}
-                            <SidebarTrigger className="lg:hidden" />
+                            <SidebarTrigger className="lg:hidden" asChild>
+                                <Button variant="ghost">
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </SidebarTrigger>
                         </div>
                         <Separator className="bg-white/10" />
                     </SidebarHeader>
@@ -41,7 +47,11 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                     {/* Top Bar */}
                     <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm p-4">
                         <div className="flex items-center justify-between">
-                            <SidebarTrigger />
+                            <SidebarTrigger asChild>
+                                <Button variant="ghost">
+                                    <Menu className="h-4 w-4" />
+                                </Button>
+                            </SidebarTrigger>
                             <h1 className="text-lg font-semibold text-foreground">
                                 Mon Compte
                             </h1>
