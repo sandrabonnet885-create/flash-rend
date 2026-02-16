@@ -86,11 +86,11 @@ export default function BankTransferHistoryPage() {
                 <Card>
                     <CardContent className="py-12 text-center">
                         <p className="text-foreground/60">Aucun dépôt par virement pour le moment</p>
-                        <Link href="/account/deposit/bank-transfer">
-                            <Button className="mt-4">
+                        <Button className="mt-4" asChild>
+                            <Link href="/account/deposit/bank-transfer">
                                 Effectuer un dépôt
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
                     </CardContent>
                 </Card>
             ) : (
