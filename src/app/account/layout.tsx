@@ -28,10 +28,8 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                                 FlashRend
                             </h2>
                             {/* Close button for mobile */}
-                            <SidebarTrigger className="lg:hidden" asChild>
-                                <Button variant="ghost">
-                                    <X className="h-4 w-4" />
-                                </Button>
+                            <SidebarTrigger className="lg:hidden">
+                                <X className="h-4 w-4" />
                             </SidebarTrigger>
                         </div>
                         <Separator className="bg-white/10" />
@@ -47,10 +45,8 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                     {/* Top Bar */}
                     <div className="border-b border-white/10 bg-white/5 backdrop-blur-sm p-4">
                         <div className="flex items-center justify-between">
-                            <SidebarTrigger asChild>
-                                <Button variant="ghost">
-                                    <Menu className="h-4 w-4" />
-                                </Button>
+                            <SidebarTrigger>
+                                <Menu className="h-4 w-4" />
                             </SidebarTrigger>
                             <h1 className="text-lg font-semibold text-foreground">
                                 Mon Compte
