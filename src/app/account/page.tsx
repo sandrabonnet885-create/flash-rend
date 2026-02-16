@@ -60,6 +60,24 @@ export default async function AccountPage() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors md:hidden">
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5 text-amber-500" />
+                            Investir
+                        </CardTitle>
+                        <CardDescription>
+                            Lancez un nouvel investissement
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link href="/account/investments">
+                            <Button className="w-full bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700">
+                                Commencer
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
                 <Card className="border-white/10 bg-white/5">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-medium text-foreground/70">
@@ -126,7 +144,7 @@ export default async function AccountPage() {
                 {/* Bonus Claim Card - Only shows if not claimed */}
                 <BonusClaimCard bonusClaimed={dbUser.bonusClaimed} />
 
-                <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors hidden md:block">
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-amber-500" />
