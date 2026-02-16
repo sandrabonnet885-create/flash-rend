@@ -184,11 +184,11 @@ export default function BankTransferDepositPage() {
     return (
         <div className="container max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/account">
-                    <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/account">
                         <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
+                    </Link>
+                </Button>
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Dépôt par virement bancaire</h1>
                     <p className="text-foreground/60 mt-1">
@@ -410,11 +410,11 @@ export default function BankTransferDepositPage() {
 
             {/* Lien vers l'historique */}
             <div className="text-center">
-                <Link href="/account/deposit/bank-transfer/history">
-                    <Button variant="link">
+                <Button variant="link" asChild>
+                    <Link href="/account/deposit/bank-transfer/history">
                         Voir l'historique de mes dépôts
-                    </Button>
-                </Link>
+                    </Link>
+                </Button>
             </div>
         </div>
     );
