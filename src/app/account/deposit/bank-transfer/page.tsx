@@ -186,7 +186,9 @@ export default function BankTransferDepositPage() {
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/account">
-                        <ArrowLeft className="h-5 w-5" />
+                        <span>
+                            <ArrowLeft className="h-5 w-5" />
+                        </span>
                     </Link>
                 </Button>
                 <div>

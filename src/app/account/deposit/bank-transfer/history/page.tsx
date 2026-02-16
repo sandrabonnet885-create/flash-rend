@@ -71,7 +71,9 @@ export default function BankTransferHistoryPage() {
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/account/deposit/bank-transfer">
-                        <ArrowLeft className="h-5 w-5" />
+                        <span>
+                            <ArrowLeft className="h-5 w-5" />
+                        </span>
                     </Link>
                 </Button>
                 <div>
