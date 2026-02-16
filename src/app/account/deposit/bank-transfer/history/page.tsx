@@ -15,7 +15,7 @@ type Deposit = {
     reference: string;
     transferDate: Date;
     status: "PENDING" | "APPROVED" | "REJECTED";
-    proofUrl: string | null;
+    proofImageUrl: string | null;
     adminNote: string | null;
     processedAt: Date | null;
     createdAt: Date;
@@ -132,16 +132,16 @@ export default function BankTransferHistoryPage() {
                                     </div>
                                 </div>
 
-                                {deposit.proofUrl && (
+                                {deposit.proofImageUrl && (
                                     <div>
                                         <p className="text-sm text-foreground/60 mb-1">Preuve de virement</p>
                                         <a
-                                            href={deposit.proofUrl}
+                                            href={deposit.proofImageUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-sm text-amber-500 hover:underline flex items-center gap-1"
                                         >
-                                            Voir la preuve
+                                            Voir la capture
                                             <ExternalLink className="h-3 w-3" />
                                         </a>
                                     </div>
