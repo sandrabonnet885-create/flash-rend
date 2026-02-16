@@ -69,11 +69,11 @@ export default function BankTransferHistoryPage() {
     return (
         <div className="container max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/account/deposit/bank-transfer">
-                    <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/account/deposit/bank-transfer">
                         <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
+                    </Link>
+                </Button>
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Historique des virements</h1>
                     <p className="text-foreground/60 mt-1">
