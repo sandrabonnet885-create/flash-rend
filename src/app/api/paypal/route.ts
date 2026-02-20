@@ -84,18 +84,27 @@ export async function PUT(req: NextRequest) {
             try {
                 if (userId) {
                     await prisma.$transaction(async (tx) => {
-                        // Update user balance
+                        // Update user balance using clerkId
                         await tx.user.update({
-                            where: { id: userId },
+                            where: { clerkId: userId },
                             data: {
                                 balance: { increment: parseFloat(amountValue) },
                             },
                         });
 
+                        // Get the user's database ID to link the transaction
+                        const dbUser = await tx.user.findUnique({
+                            where: { clerkId: userId },
+                            select: { id: true },
+                        });
+
+                        if (!dbUser)
+                            throw new Error("User not found after update");
+
                         // Create transaction record
                         await tx.transaction.create({
                             data: {
-                                userId: userId,
+                                userId: dbUser.id,
                                 amount: parseFloat(amountValue),
                                 type: "DEPOSIT",
                                 status: "COMPLETED",

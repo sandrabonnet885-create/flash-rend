@@ -7,7 +7,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, History } from "lucide-react";
+import {
+    ArrowUpRight,
+    ArrowDownLeft,
+    Wallet,
+    TrendingUp,
+    History,
+} from "lucide-react";
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
@@ -23,7 +29,7 @@ export default async function AccountPage() {
         redirect("/sign-in");
     }
 
-    const dbUser = await prisma.user.findUnique({
+    let dbUser = await prisma.user.findUnique({
         where: { clerkId: user.id },
         include: {
             transactions: {
@@ -34,8 +40,27 @@ export default async function AccountPage() {
     });
 
     if (!dbUser) {
-        // Fallback if webhook hasn't fired yet
-        return <div>Configuration du compte en cours...</div>;
+        // Just-in-time provisioning if user exists in Clerk but not in DB (e.g. after a reset)
+        try {
+            dbUser = await prisma.user.create({
+                data: {
+                    clerkId: user.id,
+                    email: user.primaryEmailAddress?.emailAddress || "",
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                },
+                include: {
+                    transactions: {
+                        take: 5,
+                        orderBy: { createdAt: "desc" },
+                    },
+                },
+            });
+        } catch (error) {
+            console.error("Error creating user in DB:", error);
+            // Fallback if creation fails
+            return <div>Configuration du compte en cours...</div>;
+        }
     }
 
     const formatCurrency = (amount: number) => {
@@ -208,7 +233,7 @@ export default async function AccountPage() {
                     </CardContent>
                 </Card> */}
 
-                 <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                             <History className="h-5 w-5 text-blue-500" />
@@ -243,7 +268,8 @@ export default async function AccountPage() {
                         </div>
                         <Link href="/account/payments/history">
                             <Button variant="ghost" size="sm">
-                                Voir tout <ArrowUpRight className="ml-2 h-4 w-4" />
+                                Voir tout{" "}
+                                <ArrowUpRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>
                     </div>
@@ -261,41 +287,65 @@ export default async function AccountPage() {
                                     className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-full ${
-                                            tx.type === 'DEPOSIT' ? 'bg-green-500/20 text-green-500' :
-                                            tx.type === 'WITHDRAWAL' ? 'bg-red-500/20 text-red-500' :
-                                            'bg-blue-500/20 text-blue-500'
-                                        }`}>
-                                            {tx.type === 'DEPOSIT' && <ArrowDownLeft className="h-4 w-4" />}
-                                            {tx.type === 'WITHDRAWAL' && <ArrowUpRight className="h-4 w-4" />}
-                                            {(tx.type !== 'DEPOSIT' && tx.type !== 'WITHDRAWAL') && <Wallet className="h-4 w-4" />}
+                                        <div
+                                            className={`p-2 rounded-full ${
+                                                tx.type === "DEPOSIT"
+                                                    ? "bg-green-500/20 text-green-500"
+                                                    : tx.type === "WITHDRAWAL"
+                                                      ? "bg-red-500/20 text-red-500"
+                                                      : "bg-blue-500/20 text-blue-500"
+                                            }`}
+                                        >
+                                            {tx.type === "DEPOSIT" && (
+                                                <ArrowDownLeft className="h-4 w-4" />
+                                            )}
+                                            {tx.type === "WITHDRAWAL" && (
+                                                <ArrowUpRight className="h-4 w-4" />
+                                            )}
+                                            {tx.type !== "DEPOSIT" &&
+                                                tx.type !== "WITHDRAWAL" && (
+                                                    <Wallet className="h-4 w-4" />
+                                                )}
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">
                                                 {tx.description || tx.type}
                                             </p>
                                             <p className="text-xs text-foreground/50">
-                                                {new Date(tx.createdAt).toLocaleDateString('fr-FR', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
+                                                {new Date(
+                                                    tx.createdAt,
+                                                ).toLocaleDateString("fr-FR", {
+                                                    day: "numeric",
+                                                    month: "long",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
                                                 })}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className={`font-bold ${
-                                            tx.type === 'DEPOSIT' ? 'text-green-500' : 
-                                            tx.type === 'WITHDRAWAL' ? 'text-foreground' : 'text-blue-500'
-                                        }`}>
-                                            {tx.type === 'DEPOSIT' ? '+' : ''}
+                                        <p
+                                            className={`font-bold ${
+                                                tx.type === "DEPOSIT"
+                                                    ? "text-green-500"
+                                                    : tx.type === "WITHDRAWAL"
+                                                      ? "text-foreground"
+                                                      : "text-blue-500"
+                                            }`}
+                                        >
+                                            {tx.type === "DEPOSIT" ? "+" : ""}
                                             {formatCurrency(tx.amount)}
                                         </p>
-                                        <Badge variant={
-                                            tx.status === 'COMPLETED' ? 'default' :
-                                            tx.status === 'PENDING' ? 'secondary' : 'destructive'
-                                        } className="text-[10px] h-5">
+                                        <Badge
+                                            variant={
+                                                tx.status === "COMPLETED"
+                                                    ? "default"
+                                                    : tx.status === "PENDING"
+                                                      ? "secondary"
+                                                      : "destructive"
+                                            }
+                                            className="text-[10px] h-5"
+                                        >
                                             {tx.status}
                                         </Badge>
                                     </div>
