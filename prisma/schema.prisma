@@ -7,34 +7,34 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  clerkId       String          @unique
-  email         String          @unique
-  firstName     String?
-  lastName      String?
-  balance       Float           @default(0)
-  bonusClaimed  Boolean         @default(false)
-  welcomeEmailSent Boolean      @default(false)
-  transactions  Transaction[]
-  bankAccounts  BankAccount[]
-  investments   Investment[]
-  refundRequests RefundRequest[]
+  id                   String                @id @default(cuid())
+  clerkId              String                @unique
+  email                String                @unique
+  firstName            String?
+  lastName             String?
+  balance              Float                 @default(0)
+  bonusClaimed         Boolean               @default(false)
+  welcomeEmailSent     Boolean               @default(false)
+  transactions         Transaction[]
+  bankAccounts         BankAccount[]
+  investments          Investment[]
+  refundRequests       RefundRequest[]
   bankTransferDeposits BankTransferDeposit[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 }
 
 model Investment {
-  id              String           @id @default(cuid())
+  id              String          @id @default(cuid())
   userId          String
-  user            User             @relation(fields: [userId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
   amount          Float
   multiplier      Float
   potentialReturn Float
   endsAt          DateTime
-  status          InvestmentState  @default(ACTIVE)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  status          InvestmentState @default(ACTIVE)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@index([userId])
 }
@@ -46,17 +46,17 @@ enum InvestmentState {
 }
 
 model RefundRequest {
-  id              String              @id @default(cuid())
-  userId          String
-  user            User                @relation(fields: [userId], references: [id])
-  amount          Float
-  reason          String
-  description     String?
-  status          RefundRequestStatus @default(PENDING)
-  adminResponse   String?
-  processedAt     DateTime?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  id            String              @id @default(cuid())
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
+  amount        Float
+  reason        String
+  description   String?
+  status        RefundRequestStatus @default(PENDING)
+  adminResponse String?
+  processedAt   DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -70,19 +70,19 @@ enum RefundRequestStatus {
 }
 
 model BankTransferDeposit {
-  id              String                    @id @default(cuid())
-  userId          String
-  user            User                      @relation(fields: [userId], references: [id])
-  amount          Float
-  reference       String                    // ID transaction fourni par l'utilisateur
-  transferDate    DateTime                  // Date du virement
-  status          BankTransferDepositStatus @default(PENDING)
-  proofImageUrl   String?                   // URL de la capture d'écran sur Vercel Blob
-  adminNote       String?                   // Note de l'admin
-  processedBy     String?                   // Email de l'admin qui a traité
-  processedAt     DateTime?
-  createdAt       DateTime                  @default(now())
-  updatedAt       DateTime                  @updatedAt
+  id            String                    @id @default(cuid())
+  userId        String
+  user          User                      @relation(fields: [userId], references: [id])
+  amount        Float
+  reference     String // ID transaction fourni par l'utilisateur
+  transferDate  DateTime // Date du virement
+  status        BankTransferDepositStatus @default(PENDING)
+  proofImageUrl String? // URL de la capture d'écran sur Vercel Blob
+  adminNote     String? // Note de l'admin
+  processedBy   String? // Email de l'admin qui a traité
+  processedAt   DateTime?
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -95,38 +95,42 @@ enum BankTransferDepositStatus {
 }
 
 model BankTransferSettings {
-  id              String   @id @default(cuid())
-  accountHolder   String
-  iban            String
-  bic             String
-  bankName        String
-  instructions    String?  // Instructions personnalisées
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  accountHolder String
+  iban          String
+  bic           String
+  bankName      String
+  instructions  String? // Instructions personnalisées
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Transaction {
-  id              String        @id @default(cuid())
+  id              String             @id @default(cuid())
   userId          String
-  user            User          @relation(fields: [userId], references: [id])
+  user            User               @relation(fields: [userId], references: [id])
   amount          Float
-  currency        String        @default("EUR")
+  currency        String             @default("EUR")
   type            TransactionType
-  status          TransactionStatus @default(PENDING)
+  status          TransactionStatus  @default(PENDING)
   description     String?
-  reference       String?       @unique
-  metadata        Json?
+  reference       String?            @unique
+  method          TransactionMethod? @default(BANK_TRANSFER)
   stripePaymentId String?
+  paypalOrderId   String?            @unique
   bankTransferId  String?
-  bankAccount     BankAccount?  @relation(fields: [bankAccountId], references: [id])
+  bankAccount     BankAccount?       @relation(fields: [bankAccountId], references: [id])
   bankAccountId   String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
   @@index([userId])
   @@index([stripePaymentId])
+  @@index([paypalOrderId])
   @@index([bankTransferId])
 }
+
 model BankAccount {
   id            String        @id @default(cuid())
   userId        String
@@ -137,10 +141,13 @@ model BankAccount {
   bankName      String?
   isDefault     Boolean       @default(false)
   transactions  Transaction[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([userId, iban])
 }
+
 enum TransactionType {
   DEPOSIT
   WITHDRAWAL
@@ -150,10 +157,19 @@ enum TransactionType {
   FEE
   BONUS
 }
+
 enum TransactionStatus {
   PENDING
   COMPLETED
   FAILED
   CANCELLED
   REFUNDED
+}
+
+enum TransactionMethod {
+  BANK_TRANSFER
+  STRIPE
+  PAYPAL
+  CRYPTO
+  OTHER
 }
