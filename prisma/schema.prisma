@@ -119,6 +119,7 @@ model Transaction {
   method          TransactionMethod? @default(BANK_TRANSFER)
   stripePaymentId String?
   paypalOrderId   String?            @unique
+  metadata        Json?
   bankTransferId  String?
   bankAccount     BankAccount?       @relation(fields: [bankAccountId], references: [id])
   bankAccountId   String?

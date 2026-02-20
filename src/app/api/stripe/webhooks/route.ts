@@ -111,6 +111,7 @@ async function handleCheckoutSessionCompleted(session: any) {
                     description: "Dépôt de fonds via Stripe Checkout",
                     reference: session.id,
                     stripePaymentId: session.payment_intent,
+                    method: "STRIPE",
                     metadata: {
                         paymentMethod:
                             session.payment_method_types?.[0] || "unknown",
@@ -177,6 +178,7 @@ async function handleChargeRefunded(charge: any) {
                     status: "COMPLETED",
                     description: "Remboursement via Stripe",
                     reference: charge.id,
+                    method: "STRIPE",
                     metadata: {
                         originalReference: transaction.reference,
                         refundedAt: new Date().toISOString(),
@@ -223,6 +225,7 @@ async function handlePaymentFailed(paymentIntent: any) {
                 where: { id: transaction.id },
                 data: {
                     status: "FAILED",
+                    method: "STRIPE",
                     metadata: {
                         failedAt: new Date().toISOString(),
                         failureReason:

@@ -65,6 +65,7 @@ export async function PUT(req: NextRequest) {
         }
 
         const request = new paypal.orders.OrdersCaptureRequest(orderID);
+        // Cast to any to bypass strict type check for empty body in capture request
         request.requestBody({} as any);
 
         const capture = await client.execute(request);
@@ -111,11 +112,11 @@ export async function PUT(req: NextRequest) {
                 // The payment was captured on PayPal's side, but we failed to update our DB.
                 // This is a critical state that might need manual intervention or an admin alert.
                 return NextResponse.json(
-                    { 
-                        error: "Payment captured but database update failed", 
-                        capture: captureResult 
+                    {
+                        error: "Payment captured but database update failed",
+                        capture: captureResult,
                     },
-                    { status: 500 }
+                    { status: 500 },
                 );
             }
         }
