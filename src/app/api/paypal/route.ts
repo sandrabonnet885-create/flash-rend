@@ -6,10 +6,13 @@ const MIN_DEPOSIT_AMOUNT = 10; // Montant minimum en EUR
 const CURRENCY = "EUR";
 
 // Configure PayPal environment
-const Environment =
-    process.env.NODE_ENV === "production"
-        ? paypal.core.LiveEnvironment
-        : paypal.core.SandboxEnvironment;
+// Utiliser PAYPAL_MODE="sandbox" ou "live" pour contrôler indépendamment de NODE_ENV
+// Cela permet de tester en sandbox même sur Vercel (production)
+const isSandbox = process.env.PAYPAL_MODE !== "live";
+
+const Environment = isSandbox
+    ? paypal.core.SandboxEnvironment
+    : paypal.core.LiveEnvironment;
 
 const client = new paypal.core.PayPalHttpClient(
     new Environment(
