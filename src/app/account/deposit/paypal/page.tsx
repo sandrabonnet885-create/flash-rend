@@ -38,14 +38,14 @@ export default function PayPalDepositPage() {
     };
 
     const handlePaymentSuccess = () => {
-        toast.success("Paiement réussi ! Votre compte sera crédité sous peu.");
-        router.push("/account/deposit/success");
+        toast.success("Paiement réussi ! Votre compte a été crédité.");
+        router.push(`/account/deposit/success?method=PayPal&amount=${amount}`);
     };
 
     const handlePaymentError = (error: Error) => {
         console.error("Payment error:", error);
         toast.error(
-            "Une erreur est survenue lors du traitement de votre paiement.",
+            "Une erreur est survenue lors du paiement. Si vous avez été débité, contactez le support.",
         );
     };
 

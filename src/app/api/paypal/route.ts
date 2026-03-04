@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import paypal from "@paypal/checkout-server-sdk";
-import prisma from "@/lib/prisma"; // Adjust path if needed
+import prisma from "@/lib/prisma";
+
+const MIN_DEPOSIT_AMOUNT = 10; // Montant minimum en EUR
+const CURRENCY = "EUR";
 
 // Configure PayPal environment
 const Environment =
@@ -21,7 +24,19 @@ export async function POST(req: NextRequest) {
 
         if (!amount || !userId) {
             return NextResponse.json(
-                { error: "Missing required fields" },
+                { error: "Champs requis manquants" },
+                { status: 400 },
+            );
+        }
+
+        const parsedAmount = parseFloat(amount);
+
+        // Validation du montant minimum
+        if (isNaN(parsedAmount) || parsedAmount < MIN_DEPOSIT_AMOUNT) {
+            return NextResponse.json(
+                {
+                    error: `Le montant minimum de dépôt est de ${MIN_DEPOSIT_AMOUNT}€`,
+                },
                 { status: 400 },
             );
         }
@@ -33,10 +48,10 @@ export async function POST(req: NextRequest) {
             purchase_units: [
                 {
                     amount: {
-                        currency_code: "EUR",
-                        value: amount.toString(),
+                        currency_code: CURRENCY,
+                        value: parsedAmount.toFixed(2), // Format précis 2 décimales
                     },
-                    custom_id: userId, // Store userId to link payment later
+                    custom_id: userId, // Store clerkId for linkage after capture
                 },
             ],
         });
@@ -45,9 +60,13 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ id: order.result.id });
     } catch (error: any) {
-        console.error("Error creating PayPal order:", error);
+        console.error("[PAYPAL_CREATE_ORDER]", error);
         return NextResponse.json(
-            { error: error.message || "Error creating order" },
+            {
+                error:
+                    error.message ||
+                    "Erreur lors de la création de la commande",
+            },
             { status: 500 },
         );
     }
@@ -59,82 +78,99 @@ export async function PUT(req: NextRequest) {
 
         if (!orderID) {
             return NextResponse.json(
-                { error: "Missing orderID" },
+                { error: "orderID manquant" },
                 { status: 400 },
             );
         }
 
+        // Idempotence : vérifier si cet ordre a déjà été capturé et traité
+        const existingTransaction = await prisma.transaction.findFirst({
+            where: { paypalOrderId: orderID },
+        });
+
+        if (existingTransaction) {
+            console.log(`[PAYPAL_CAPTURE] Order ${orderID} already processed.`);
+            return NextResponse.json({
+                status: "ALREADY_PROCESSED",
+                message: "Ce paiement a déjà été traité",
+            });
+        }
+
         const request = new paypal.orders.OrdersCaptureRequest(orderID);
-        // Cast to any to bypass strict type check for empty body in capture request
         request.requestBody({} as any);
 
         const capture = await client.execute(request);
         const captureResult = capture.result;
 
-        // Check if transaction is completed
         if (captureResult.status === "COMPLETED") {
             const purchaseUnit = captureResult.purchase_units[0];
-            const amountValue = purchaseUnit.payments.captures[0].amount.value;
-            const userId = purchaseUnit.custom_id; // Retrieve userId from custom_id
+            const captureInfo = purchaseUnit.payments.captures[0];
+            const amountValue = captureInfo.amount.value;
+            const captureCurrency = captureInfo.amount.currency_code;
+            const userId = purchaseUnit.custom_id;
+
+            // Validation de la devise retournée par PayPal
+            if (captureCurrency !== CURRENCY) {
+                console.error(
+                    `[PAYPAL_CAPTURE] Unexpected currency: ${captureCurrency}`,
+                );
+                return NextResponse.json(
+                    { error: `Devise inattendue: ${captureCurrency}` },
+                    { status: 400 },
+                );
+            }
 
             console.log(
-                `Payment captured successfully for user ${userId}: ${amountValue} EUR`,
+                `[PAYPAL_CAPTURE] Payment captured for user ${userId}: ${amountValue} ${captureCurrency}`,
             );
 
-            try {
-                if (userId) {
-                    await prisma.$transaction(async (tx) => {
-                        // Update user balance using clerkId
-                        await tx.user.update({
-                            where: { clerkId: userId },
-                            data: {
-                                balance: { increment: parseFloat(amountValue) },
-                            },
-                        });
-
-                        // Get the user's database ID to link the transaction
-                        const dbUser = await tx.user.findUnique({
-                            where: { clerkId: userId },
-                            select: { id: true },
-                        });
-
-                        if (!dbUser)
-                            throw new Error("User not found after update");
-
-                        // Create transaction record
-                        await tx.transaction.create({
-                            data: {
-                                userId: dbUser.id,
-                                amount: parseFloat(amountValue),
-                                type: "DEPOSIT",
-                                status: "COMPLETED",
-                                description: `Dépôt PayPal`,
-                                reference: captureResult.id,
-                                method: "PAYPAL",
-                                paypalOrderId: captureResult.id,
-                            },
-                        });
+            if (userId) {
+                await prisma.$transaction(async (tx) => {
+                    // Double vérification dans la transaction (race condition)
+                    const alreadyExists = await tx.transaction.findFirst({
+                        where: { paypalOrderId: orderID },
                     });
-                }
-            } catch (dbError) {
-                console.error("Database update error:", dbError);
-                // The payment was captured on PayPal's side, but we failed to update our DB.
-                // This is a critical state that might need manual intervention or an admin alert.
-                return NextResponse.json(
-                    {
-                        error: "Payment captured but database update failed",
-                        capture: captureResult,
-                    },
-                    { status: 500 },
-                );
+                    if (alreadyExists) return;
+
+                    await tx.user.update({
+                        where: { clerkId: userId },
+                        data: {
+                            balance: { increment: parseFloat(amountValue) },
+                        },
+                    });
+
+                    const dbUser = await tx.user.findUnique({
+                        where: { clerkId: userId },
+                        select: { id: true },
+                    });
+
+                    if (!dbUser)
+                        throw new Error(
+                            "Utilisateur introuvable après mise à jour",
+                        );
+
+                    await tx.transaction.create({
+                        data: {
+                            userId: dbUser.id,
+                            amount: parseFloat(amountValue),
+                            type: "DEPOSIT",
+                            status: "COMPLETED",
+                            description: `Dépôt PayPal`,
+                            reference: captureResult.id,
+                            method: "PAYPAL",
+                            currency: CURRENCY,
+                            paypalOrderId: orderID,
+                        },
+                    });
+                });
             }
         }
 
         return NextResponse.json(captureResult);
     } catch (error: any) {
-        console.error("Error capturing PayPal order:", error);
+        console.error("[PAYPAL_CAPTURE_ORDER]", error);
         return NextResponse.json(
-            { error: error.message || "Error capturing order" },
+            { error: error.message || "Erreur lors de la capture du paiement" },
             { status: 500 },
         );
     }
