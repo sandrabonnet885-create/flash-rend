@@ -10,9 +10,10 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, CreditCard, Wallet } from "lucide-react";
+import { Building2, CreditCard, Wallet, Clock } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function DepositSelectionPage() {
     const { user } = useUser();
@@ -29,6 +30,19 @@ export default function DepositSelectionPage() {
             bgColor: "bg-blue-500/10",
             processingTime: "1-3 jours ouvrés",
             minAmount: "100€",
+            comingSoon: false,
+        },
+        {
+            title: "PayPal",
+            description:
+                "Paiement rapide et sécurisé avec votre compte PayPal.",
+            icon: Wallet,
+            href: "/account/deposit/paypal",
+            color: "text-sky-500",
+            bgColor: "bg-sky-500/10",
+            processingTime: "Instantané",
+            minAmount: "10€",
+            comingSoon: false,
         },
         {
             title: "Carte Bancaire",
@@ -39,19 +53,21 @@ export default function DepositSelectionPage() {
             bgColor: "bg-purple-500/10",
             processingTime: "Instantané",
             minAmount: "10€",
-        },
-        {
-            title: "PayPal",
-            description:
-                "Paiement rapide et sécurisé avec votre compte PayPal.",
-            icon: Wallet, // Use Wallet for now, or find a specific PayPal icon if available in Lucide or import SVG
-            href: "/account/deposit/paypal",
-            color: "text-sky-500",
-            bgColor: "bg-sky-500/10",
-            processingTime: "Instantané",
-            minAmount: "10€",
+            comingSoon: true, // Temporairement désactivé
         },
     ];
+
+    const handleMethodClick = (
+        method: (typeof depositMethods)[0],
+        e: React.MouseEvent,
+    ) => {
+        if (method.comingSoon) {
+            e.preventDefault();
+            toast.info(
+                "Bientôt disponible ! Utilisez Virement Bancaire ou PayPal pour l'instant.",
+            );
+        }
+    };
 
     if (!user) {
         return (
@@ -76,19 +92,41 @@ export default function DepositSelectionPage() {
                     <Link
                         key={method.title}
                         href={method.href}
-                        className="group"
+                        className={cn(
+                            "group",
+                            method.comingSoon && "cursor-pointer",
+                        )}
+                        onClick={(e) => handleMethodClick(method, e)}
                     >
-                        <Card className="h-full transition-all hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/5">
+                        <Card
+                            className={cn(
+                                "h-full transition-all",
+                                method.comingSoon
+                                    ? "opacity-60 border-dashed hover:border-muted-foreground/40"
+                                    : "hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/5",
+                            )}
+                        >
                             <CardHeader>
-                                <div
-                                    className={cn(
-                                        "w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110",
-                                        method.bgColor,
+                                <div className="flex items-start justify-between">
+                                    <div
+                                        className={cn(
+                                            "w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110",
+                                            method.bgColor,
+                                        )}
+                                    >
+                                        <method.icon
+                                            className={cn(
+                                                "w-6 h-6",
+                                                method.color,
+                                            )}
+                                        />
+                                    </div>
+                                    {method.comingSoon && (
+                                        <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                                            <Clock className="w-3 h-3" />
+                                            Bientôt
+                                        </span>
                                     )}
-                                >
-                                    <method.icon
-                                        className={cn("w-6 h-6", method.color)}
-                                    />
                                 </div>
                                 <CardTitle className="text-xl">
                                     {method.title}
@@ -113,10 +151,18 @@ export default function DepositSelectionPage() {
                                     </div>
                                 </div>
                                 <Button
-                                    className="w-full mt-6 group-hover:bg-amber-500 group-hover:text-white transition-colors"
+                                    className={cn(
+                                        "w-full mt-6 transition-colors",
+                                        method.comingSoon
+                                            ? "opacity-50 cursor-not-allowed"
+                                            : "group-hover:bg-amber-500 group-hover:text-white",
+                                    )}
                                     variant="outline"
+                                    disabled={method.comingSoon}
                                 >
-                                    Choisir
+                                    {method.comingSoon
+                                        ? "Bientôt disponible"
+                                        : "Choisir"}
                                 </Button>
                             </CardContent>
                         </Card>
