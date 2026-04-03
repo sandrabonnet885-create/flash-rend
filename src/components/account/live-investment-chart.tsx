@@ -92,9 +92,9 @@ export default function LiveInvestmentChart({ investment }: { investment: Active
                     style={{ width: `${progressPercent}%` }}
                 />
             </div>
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardHeader className="pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
                 <div>
-                    <CardTitle className=" flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                         <Activity className="h-5 w-5 text-green-500 animate-pulse" />
                         Investissement Actif
                         <Badge variant="outline" className="ml-2 bg-green-500/10 text-green-500 border-green-500/20">
@@ -102,7 +102,7 @@ export default function LiveInvestmentChart({ investment }: { investment: Active
                         </Badge>
                     </CardTitle>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground font-mono bg-background/50 px-3 py-1.5 rounded-md border border-border/50">
+                <div className="flex items-center gap-2 text-muted-foreground font-mono bg-background/50 px-3 py-1.5 rounded-md border border-border/50 self-start sm:self-auto">
                     <Clock className="h-4 w-4" />
                     <span>{timeLeftStr}</span>
                 </div>
@@ -110,18 +110,18 @@ export default function LiveInvestmentChart({ investment }: { investment: Active
             <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div>
-                        <p className="text-sm text-muted-foreground mb-1">Mise Initiale</p>
-                        <p className="text-xl font-semibold">{formatCurrency(investment.amount)}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Mise Initiale</p>
+                        <p className="text-lg sm:text-xl font-semibold">{formatCurrency(investment.amount)}</p>
                     </div>
                     <div>
-                        <p className="text-sm text-muted-foreground mb-1">Cible Estimée</p>
-                        <p className="text-xl font-bold text-green-600/70">{formatCurrency(investment.potentialReturn)}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Cible Estimée</p>
+                        <p className="text-lg sm:text-xl font-bold text-green-600/70">{formatCurrency(investment.potentialReturn)}</p>
                     </div>
-                    <div className="md:col-span-2 text-right">
-                        <p className="text-sm text-muted-foreground mb-1">Valeur Actuelle (Live)</p>
-                        <p className="text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-green-600 to-emerald-400 flex items-center justify-end gap-2">
+                    <div className="col-span-2 md:col-span-2 sm:text-right">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">Valeur Actuelle (Live)</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-green-600 to-emerald-400 flex items-center sm:justify-end gap-2">
                             {formatCurrency(currentValue)}
-                            <TrendingUp className="h-6 w-6 text-green-500" />
+                            <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
                         </p>
                     </div>
                 </div>

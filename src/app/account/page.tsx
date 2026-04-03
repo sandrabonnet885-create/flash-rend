@@ -63,6 +63,18 @@ export default async function AccountPage() {
         }
     }
 
+    const investments = await prisma.investment.findMany({
+        where: { user: { clerkId: user.id } },
+    });
+
+    const activeInvestments = investments.filter(inv => inv.status === 'ACTIVE');
+    const completedInvestments = investments.filter(inv => inv.status === 'COMPLETED');
+    
+    const totalGains = completedInvestments.reduce((acc, inv) => acc + (inv.potentialReturn - inv.amount), 0);
+    const totalInvestedCompleted = completedInvestments.reduce((acc, inv) => acc + inv.amount, 0);
+    const averageYield = totalInvestedCompleted > 0 ? (totalGains / totalInvestedCompleted) * 100 : 0;
+
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat("fr-FR", {
             style: "currency",
@@ -127,10 +139,10 @@ export default async function AccountPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-500">
-                            {formatCurrency(0)}
+                            +{formatCurrency(totalGains)}
                         </div>
                         <p className="text-xs text-foreground/50 mt-1">
-                            +0% ce mois
+                            Bénéfices totaux réalisés
                         </p>
                     </CardContent>
                 </Card>
@@ -142,7 +154,7 @@ export default async function AccountPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">0</div>
+                        <div className="text-2xl font-bold">{activeInvestments.length}</div>
                         <p className="text-xs text-foreground/50 mt-1">
                             Sessions en cours
                         </p>
@@ -156,9 +168,11 @@ export default async function AccountPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">--</div>
+                        <div className="text-2xl font-bold text-blue-500">
+                            {averageYield > 0 ? `+${averageYield.toFixed(1)}%` : '--'}
+                        </div>
                         <p className="text-xs text-foreground/50 mt-1">
-                            En attente de données
+                            Sur placements terminés
                         </p>
                     </CardContent>
                 </Card>
