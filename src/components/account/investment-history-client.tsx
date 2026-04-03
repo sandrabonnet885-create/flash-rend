@@ -14,6 +14,7 @@ import { fr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import LiveInvestmentChart from "./live-investment-chart";
 
 type Investment = {
     id: string;
@@ -105,8 +106,22 @@ export default function InvestmentHistoryClient() {
         return <div className="py-8 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" /></div>;
     }
 
+    const activeInvestments = investments.filter(inv => inv.status === "ACTIVE");
+
     return (
-         <Table>
+        <div className="space-y-12">
+            {activeInvestments.length > 0 && (
+                <div className="space-y-6">
+                    {activeInvestments.map(inv => (
+                        <LiveInvestmentChart key={`chart-${inv.id}`} investment={inv} />
+                    ))}
+                </div>
+            )}
+            
+            <div className="space-y-4">
+                <h3 className="text-xl font-semibold">Tous vos placements</h3>
+                <div className="rounded-md border">
+                    <Table>
             <TableHeader>
                 <TableRow>
                     <TableHead>Date</TableHead>
@@ -148,5 +163,8 @@ export default function InvestmentHistoryClient() {
                 )}
             </TableBody>
         </Table>
+                </div>
+            </div>
+        </div>
     );
 }

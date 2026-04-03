@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Euro, PieChart } from "lucide-react";
+import { PerformanceChart } from "@/components/account/performance-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -71,10 +72,10 @@ export default async function PerformancePage() {
             
             <Card>
                 <CardHeader>
-                     <CardTitle>Répartition</CardTitle>
+                     <CardTitle>Évolution du Portefeuille</CardTitle>
                 </CardHeader>
-                <CardContent className="h-[300px] flex items-center justify-center text-muted-foreground">
-                    Graphiques de performance à venir...
+                <CardContent className="h-[300px] p-0 pb-4 pr-4">
+                    <PerformanceChart investments={investments as any} />
                 </CardContent>
             </Card>
         </div>
