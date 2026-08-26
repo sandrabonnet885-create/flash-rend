@@ -640,6 +640,67 @@ export async function sendWithdrawalRejectedEmail(user: User, withdrawal: Withdr
     }
 }
 
+// Message personnalisé envoyé par un admin
+export async function sendAdminMessageEmail(
+    recipient: { email: string; firstName?: string | null },
+    subject: string,
+    message: string
+) {
+    try {
+        const paragraphs = message
+            .split(/\n{2,}/)
+            .map((p) => `<p>${p.replace(/\n/g, "<br />")}</p>`)
+            .join("");
+
+        await resend.emails.send({
+            from: FROM_EMAIL,
+            to: recipient.email,
+            subject,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+                        .message-box { background: white; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; }
+                        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
+                            <h1>Message de l'équipe FlashRend</h1>
+                        </div>
+                        <div class="content">
+                            <p>Bonjour ${recipient.firstName || ""},</p>
+
+                            <div class="message-box">
+                                ${paragraphs}
+                            </div>
+
+                            <p>Cordialement,</p>
+                            <p>L'équipe FlashRend</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 FlashRend. Tous droits réservés.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+        });
+        console.log(`Admin message email sent to ${recipient.email}`);
+    } catch (error) {
+        console.error("Error sending admin message email:", error);
+        throw error;
+    }
+}
+
 // Notification admin - Nouveau retrait
 export async function sendAdminWithdrawalNotification(user: User, withdrawal: Withdrawal) {
     try {

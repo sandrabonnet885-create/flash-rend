@@ -16,6 +16,7 @@ import {
     Loader2,
     Menu,
     X,
+    Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,11 @@ const adminMenuItems = [
         title: "Infos banque",
         icon: RefreshCcw,
         href: "/admin/settings/bank-info",
+    },
+    {
+        title: "Envoyer un email",
+        icon: Mail,
+        href: "/admin/messages",
     },
 ];
 
