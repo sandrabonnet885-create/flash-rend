@@ -57,6 +57,7 @@ export async function sendWelcomeEmail(user: User) {
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>Bienvenue sur FlashRend !</h1>
                         </div>
                         <div class="content">
@@ -120,6 +121,7 @@ export async function sendDepositSubmittedEmail(user: User, deposit: Deposit) {
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>Dépôt reçu !</h1>
                         </div>
                         <div class="content">
@@ -180,6 +182,7 @@ export async function sendDepositApprovedEmail(user: User, deposit: Deposit) {
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>✅ Dépôt approuvé !</h1>
                         </div>
                         <div class="content">
@@ -242,6 +245,7 @@ export async function sendDepositRejectedEmail(user: User, deposit: Deposit) {
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>Dépôt non validé</h1>
                         </div>
                         <div class="content">
@@ -300,6 +304,7 @@ export async function sendAdminDepositNotification(user: User, deposit: Deposit)
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>🔔 Nouveau dépôt</h1>
                         </div>
                         <div class="content">
@@ -356,6 +361,7 @@ export async function sendInvestmentCreatedEmail(user: User, investment: Investm
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>📈 Investissement lancé !</h1>
                         </div>
                         <div class="content">
@@ -420,6 +426,7 @@ export async function sendInvestmentCompletedEmail(user: User, investment: Inves
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>🎉 Félicitations !</h1>
                         </div>
                         <div class="content">
@@ -482,6 +489,7 @@ export async function sendWithdrawalRequestedEmail(user: User, withdrawal: Withd
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>Demande de retrait reçue !</h1>
                         </div>
                         <div class="content">
@@ -539,6 +547,7 @@ export async function sendWithdrawalApprovedEmail(user: User, withdrawal: Withdr
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>✅ Retrait approuvé !</h1>
                         </div>
                         <div class="content">
@@ -596,6 +605,7 @@ export async function sendWithdrawalRejectedEmail(user: User, withdrawal: Withdr
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>Demande de retrait refusée</h1>
                         </div>
                         <div class="content">
@@ -655,6 +665,7 @@ export async function sendAdminWithdrawalNotification(user: User, withdrawal: Wi
                 <body>
                     <div class="container">
                         <div class="header">
+                            <img src="https://flashrend.site/logo.png" alt="FlashRend" style="height: 44px; margin-bottom: 12px;" />
                             <h1>🔔 Nouvelle demande de retrait</h1>
                         </div>
                         <div class="content">
