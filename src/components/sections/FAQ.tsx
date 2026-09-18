@@ -47,8 +47,9 @@ export default function FAQSection() {
                             </AccordionTrigger>
                             {/* forceMount : sans lui, Radix démonte le contenu
                                 fermé et aucune réponse n'apparaît dans le HTML
-                                servi aux crawlers. Radix pose l'attribut
-                                `hidden` tant que l'item est replié. */}
+                                servi aux crawlers. Le repli visuel est assuré
+                                par `data-[state=closed]:hidden` dans
+                                ui/accordion.tsx. */}
                             <AccordionContent
                                 forceMount
                                 className="text-foreground/70 leading-relaxed"
