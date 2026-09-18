@@ -3,38 +3,32 @@
 import Link from "next/link";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 const steps = [
     {
         number: 1,
-        title: "Créer un compte",
+        title: "Créer votre compte",
         description:
-            "Inscrivez-vous ou connectez-vous à votre compte FlashRend en quelques secondes pour accéder à la plateforme.",
+            "Inscrivez-vous en quelques secondes avec votre email, Google ou Apple. Aucune connaissance technique en cryptomonnaies n'est requise pour démarrer.",
     },
     {
         number: 2,
-        title: "Faire le paiement",
+        title: "Déposer votre capital",
         description:
-            "Deposez le montant que vous souhaitez investir via notre système de paiement sécurisé et rapide.",
+            "Déposez le montant que vous souhaitez investir par virement bancaire, carte ou PayPal. Vous choisissez librement votre montant de départ.",
     },
     {
         number: 3,
-        title: "Attendre le décompte",
+        title: "Suivre votre session",
         description:
-            "Nos experts positionnent votre capital et vous suiverez le décompte en temps réel jusqu'à la fin de la session.",
+            "Nos experts positionnent votre capital sur les crypto-actifs sélectionnés. Vous suivez la progression et les gains estimés en temps réel sur votre tableau de bord.",
     },
     {
         number: 4,
         title: "Récupérer vos gains",
         description:
-            "Une fois le décompte terminé, récupérez vos gains et réinvestissez ou retirez selon vos envies.",
+            "À la fin de la session, retirez vos gains vers votre compte bancaire sous 24 à 48 h, ou réinvestissez-les sur une nouvelle session.",
     },
 ];
 
@@ -48,17 +42,19 @@ export default function WhoItWorkSection() {
                         Mode d'emploi
                     </Badge>
 
+                    {/* h2 formulé comme une requête de recherche. */}
                     <h2 className="text-4xl sm:text-5xl font-bold mb-6 tracking-tight">
-                        Comment ça{" "}
+                        Comment investir en crypto{" "}
                         <span className="bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
-                            marche
+                            en 4 étapes
                         </span>
                     </h2>
 
                     <p className="text-sm lg:text-base text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-                        Quatre étapes simples pour commencer à générer des
-                        rendements rapides avec FlashRend. Le processus a été
-                        conçu pour être aussi intuitif que possible.
+                        Investir dans les cryptomonnaies avec FlashRend ne
+                        demande ni portefeuille crypto, ni compte sur une
+                        plateforme d'échange. Voici le parcours complet, de
+                        l'inscription au retrait de vos gains.
                     </p>
                 </div>
 
@@ -75,9 +71,11 @@ export default function WhoItWorkSection() {
                             </div>
 
                             <CardHeader className="pt-8">
-                                <CardTitle className="text-xl">
+                                {/* h3 plutôt que CardTitle (un div) : conserve
+                                    la hiérarchie h1 > h2 > h3 pour les crawlers. */}
+                                <h3 className="text-xl font-semibold leading-none">
                                     {step.title}
-                                </CardTitle>
+                                </h3>
                             </CardHeader>
 
                             <CardContent className="grow">
@@ -93,7 +91,7 @@ export default function WhoItWorkSection() {
                 <div className="flex justify-center">
                     <Link href="/login">
                         <Button size="lg" className="px-8 hover:cursor-pointer">
-                            Commencer maintenant
+                            Créer mon compte FlashRend
                         </Button>
                     </Link>
                 </div>

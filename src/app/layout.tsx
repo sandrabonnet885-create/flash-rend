@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
+import { siteConfig } from "@/lib/seo";
+import {
+    JsonLd,
+    organizationSchema,
+    websiteSchema,
+} from "@/components/seo/json-ld";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import CookieConsent from "@/components/cookie-consent";
@@ -28,43 +34,55 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "FlashRend - Investissement Crypto Simplifié",
-    description:
-        "Investissement en cryptomonnaies simplifié et rapide. Obtenez des rendements exceptionnels (900-1000%) en quelques heures avec nos experts.",
-    keywords: [
-        "crypto",
-        "investissement",
-        "bitcoin",
-        "ethereum",
-        "rendement",
-        "cryptomonnaie",
-    ],
-    authors: [{ name: "FlashRend Team" }],
+    metadataBase: new URL(siteConfig.url),
+    title: {
+        default: siteConfig.title,
+        template: siteConfig.titleTemplate,
+    },
+    description: siteConfig.description,
+    keywords: [...siteConfig.keywords],
+    applicationName: siteConfig.name,
+    authors: [{ name: "FlashRend Team", url: siteConfig.url }],
+    creator: siteConfig.name,
+    publisher: siteConfig.legalName,
+    category: "finance",
+    alternates: {
+        canonical: "/",
+    },
     openGraph: {
         type: "website",
-        locale: "fr_FR",
-        url: "https://flashrend.com",
-        siteName: "FlashRend",
+        locale: siteConfig.locale,
+        url: siteConfig.url,
+        siteName: siteConfig.name,
         title: "FlashRend - Investissement Crypto Simplifié & Rapide",
-        description:
-            "Investissement en cryptomonnaies simplifié et rapide. Obtenez des rendements exceptionnels (900-1000%) en quelques heures avec nos experts.",
-        images: [
-            {
-                url: "https://flashrend.com/logo.png",
-                width: 1200,
-                height: 630,
-                alt: "FlashRend - Investissement Crypto",
-                type: "image/png",
-            },
-        ],
+        description: siteConfig.description,
+        // L'image est générée par app/opengraph-image.tsx (1200x630).
     },
     twitter: {
         card: "summary_large_image",
-        title: "FlashRend - Investissement Crypto Simplifié",
-        description:
-            "Investissement en cryptomonnaies simplifié et rapide. Rendements exceptionnels en quelques heures.",
-        images: ["https://flashrend.com/logo.png"],
-        creator: "@FlashRend",
+        site: siteConfig.twitter,
+        creator: siteConfig.twitter,
+        title: "FlashRend - Investissement Crypto Simplifié & Rapide",
+        description: siteConfig.description,
+    },
+    icons: {
+        icon: [
+            { url: "/favicon.ico", sizes: "any" },
+            { url: "/logo.png", type: "image/png", sizes: "512x512" },
+        ],
+        shortcut: "/favicon.ico",
+        apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
+    },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+        capable: true,
+        title: siteConfig.name,
+        statusBarStyle: "black-translucent",
+    },
+    formatDetection: {
+        telephone: false,
+        email: false,
+        address: false,
     },
     robots: {
         index: true,
@@ -77,9 +95,20 @@ export const metadata: Metadata = {
             "max-video-preview": -1,
         },
     },
-    verification: {
-        google: "google-site-verification-code",
-    },
+    // Renseigner GOOGLE_SITE_VERIFICATION dans l'environnement pour activer la balise.
+    verification: process.env.GOOGLE_SITE_VERIFICATION
+        ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+        : undefined,
+};
+
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    themeColor: [
+        { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+        { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    ],
+    colorScheme: "dark light",
 };
 
 export default function RootLayout({
@@ -89,7 +118,11 @@ export default function RootLayout({
 }>) {
     return (
         <ClerkProvider>
-            <html lang="fr" className="scroll-smooth" suppressHydrationWarning>
+            <html
+                lang={siteConfig.lang}
+                className="scroll-smooth"
+                suppressHydrationWarning
+            >
                 <body
                     className={`${spaceGrotesk.variable} ${spaceMono.variable} antialiased font-grotesk scroll-smooth`}
                 >
@@ -99,6 +132,8 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
+                        <JsonLd data={organizationSchema} />
+                        <JsonLd data={websiteSchema} />
                         {children}
                         <TidioChat />
                         <CookieConsent />

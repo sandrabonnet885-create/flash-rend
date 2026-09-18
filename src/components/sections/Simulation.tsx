@@ -106,16 +106,19 @@ export default function SimulationSection() {
                     </Badge>
 
                     <h2 className="text-4xl sm:text-5xl font-bold mb-6 tracking-tight">
-                        Simulez vos{" "}
+                        Simulateur de gains{" "}
                         <span className="bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
-                            gains
+                            crypto
                         </span>
                     </h2>
 
                     <p className="text-sm lg:text-base text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-                        Découvrez les rendements approximatifs que vous pouvez
-                        obtenir. Entrez votre montant d'investissement et
-                        laissez nos experts calculer vos gains potentiels.
+                        Entrez le montant que vous envisagez d'investir et
+                        obtenez une estimation du rendement d'une session
+                        FlashRend. La simulation est gratuite, sans inscription
+                        et ne vous engage à rien. Il s'agit d'une estimation
+                        indicative : elle ne constitue ni une garantie de
+                        résultat, ni un conseil en investissement.
                     </p>
                 </div>
 

@@ -6,12 +6,15 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const footerLinks = {
+    // Ancres préfixées par "/" : depuis /contact ou /legal elles renvoient bien
+    // vers la section de l'accueil, et les crawlers suivent une URL résolvable.
     navigation: [
-        { label: "Accueil", href: "#accueil" },
-        { label: "Qui sommes-nous", href: "#qui-sommes-nous" },
-        { label: "Comment ça marche", href: "#comment-ca-marche" },
-        { label: "Simulation", href: "#simulation" },
-        { label: "FAQ", href: "#faq" },
+        { label: "Accueil", href: "/" },
+        { label: "Qui sommes-nous", href: "/#qui-sommes-nous" },
+        { label: "Comment ça marche", href: "/#comment-ca-marche" },
+        { label: "Simulation", href: "/#simulation" },
+        { label: "FAQ", href: "/#faq" },
+        { label: "Contact", href: "/contact" },
     ],
     legal: [
         { label: "Conditions d'utilisation", href: "/terms" },
@@ -35,7 +38,7 @@ export default function FooterSection() {
                     {/* Brand */}
                     <div className="lg:col-span-1">
                         <Link
-                            href="#accueil"
+                            href="/"
                             className="flex items-center gap-2 mb-6"
                         >
                             <div className="relative w-10 h-10">
@@ -100,7 +103,7 @@ export default function FooterSection() {
                             <li className="flex items-start gap-3">
                                 <Mail className="w-4 h-4 mt-1 text-amber-500 shrink-0" />
                                 <Link
-                                    href="mailto:contact@flashrend.com"
+                                    href="mailto:contact@flashrend.site"
                                     className="text-foreground/60 hover:text-foreground transition-colors text-sm"
                                 >
                                     contact@flashrend.site

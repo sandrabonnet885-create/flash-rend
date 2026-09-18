@@ -2,10 +2,24 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { JsonLd, breadcrumbSchema } from "@/components/seo/json-ld";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Politique de confidentialité",
+    description:
+        "Comment FlashRend collecte, utilise et protège vos données personnelles, conformément au RGPD : finalités, durées de conservation et exercice de vos droits.",
+    alternates: { canonical: "/privacy" },
+};
 
 export default function PrivacyPage() {
     return (
         <div className="min-h-screen bg-background">
+            <JsonLd
+                data={breadcrumbSchema([
+                    { name: "Politique de confidentialité", path: "/privacy" },
+                ])}
+            />
             {/* Header */}
             <header className="border-b border-border/50 bg-card/30 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

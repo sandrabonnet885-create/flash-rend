@@ -64,13 +64,15 @@ export default function TestimonialsSection() {
                         Témoignages
                     </Badge>
                     <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-                        Ce que disent nos{" "}
+                        Avis de nos{" "}
                         <span className="bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
                             investisseurs
                         </span>
                     </h2>
                     <p className="text-foreground/70 max-w-2xl mx-auto">
-                        Découvrez les expériences de nos utilisateurs qui ont fait confiance à FlashRend pour faire fructifier leurs investissements.
+                        Entrepreneurs, étudiants, débutants en cryptomonnaies ou
+                        investisseurs confirmés : voici comment nos utilisateurs
+                        décrivent leur expérience de la plateforme FlashRend.
                     </p>
                 </div>
 

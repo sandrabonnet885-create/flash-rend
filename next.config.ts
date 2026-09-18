@@ -18,6 +18,21 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    async headers() {
+        return [
+            {
+                // Espaces privés : les layouts sont des Client Components et ne
+                // peuvent pas exporter `metadata`, on passe donc par l'en-tête.
+                source: "/:path(account|admin|dashboard|api)/:rest*",
+                headers: [
+                    {
+                        key: "X-Robots-Tag",
+                        value: "noindex, nofollow, noarchive",
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 export default nextConfig;

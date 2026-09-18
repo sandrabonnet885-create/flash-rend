@@ -27,35 +27,38 @@ export default function HeroSection() {
 
             <div className="relative z-10 text-center max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
                 <Badge variant="outline" className="mb-4">
-                    Bienvenue à FlashRend
+                    Plateforme d'investissement en cryptomonnaies
                 </Badge>
 
+                {/* Unique h1 de la page : porte le mot-clé principal. */}
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                    Investissement{" "}
+                    Investissement crypto{" "}
                     <span className="bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
-                        Simplifié & Rapide
+                        simplifié & rapide
                     </span>
                 </h1>
 
                 <p className="text-sm sm:text-base text-foreground/70 mb-8 leading-relaxed">
-                    Découvrez la façon la plus simple et la plus rapide
-                    d'investir dans les cryptomonnaies. Commencez votre voyage
-                    financier en quelques minutes.
+                    Investir dans les cryptomonnaies sans y passer vos journées :
+                    déposez votre capital, nos experts le positionnent sur
+                    Bitcoin, Ethereum et Solana, et vous suivez la progression de
+                    votre session en temps réel depuis votre tableau de bord.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    {/* Ancres explicites : le texte du lien décrit sa destination. */}
                     <Link href="#simulation">
                         <Button size="lg" className="w-full sm:w-auto">
-                            Commencer la simulation
+                            Simuler mon investissement
                         </Button>
                     </Link>
-                    <Link href="#qui-sommes-nous">
+                    <Link href="#comment-ca-marche">
                         <Button
                             size="lg"
                             variant="outline"
                             className="w-full sm:w-auto"
                         >
-                            En savoir plus
+                            Comment ça marche
                         </Button>
                     </Link>
                 </div>

@@ -100,16 +100,21 @@ export default function ContactSection() {
                         Contactez-nous
                     </Badge>
 
-                    <h2 className="text-4xl sm:text-5xl font-bold mb-6 tracking-tight">
-                        Nous sommes là pour{" "}
+                    {/* La section n'est rendue que sur /contact : c'est le h1
+                        de cette page, qui n'en avait aucun. */}
+                    <h1 className="text-4xl sm:text-5xl font-bold mb-6 tracking-tight">
+                        Contacter{" "}
                         <span className="bg-linear-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
-                            vous aider
+                            FlashRend
                         </span>
-                    </h2>
+                    </h1>
 
                     <p className="text-sm lg:text-base text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-                        Vous avez des questions ? Notre équipe est disponible
-                        24/7 pour répondre à vos demandes.
+                        Une question sur un dépôt, une session d'investissement
+                        ou un retrait ? Notre équipe support est disponible
+                        24h/24 et 7j/7, par formulaire, par email ou par
+                        téléphone, avec un délai de réponse moyen inférieur à
+                        une heure.
                     </p>
                 </div>
 

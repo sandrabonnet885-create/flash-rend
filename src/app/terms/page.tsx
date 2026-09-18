@@ -2,10 +2,27 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { JsonLd, breadcrumbSchema } from "@/components/seo/json-ld";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Conditions générales d'utilisation",
+    description:
+        "Conditions générales d'utilisation de FlashRend : accès au service, obligations des utilisateurs, investissements, retraits, risques et responsabilités.",
+    alternates: { canonical: "/terms" },
+};
 
 export default function TermsPage() {
     return (
         <div className="min-h-screen bg-background">
+            <JsonLd
+                data={breadcrumbSchema([
+                    {
+                        name: "Conditions générales d'utilisation",
+                        path: "/terms",
+                    },
+                ])}
+            />
             {/* Header */}
             <header className="border-b border-border/50 bg-card/30 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

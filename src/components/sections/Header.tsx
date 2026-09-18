@@ -7,12 +7,13 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
+// Ancres préfixées par "/" : le header est aussi rendu sur /contact.
 const navLinks = [
-    { label: "Accueil", href: "#accueil" },
-    { label: "Qui sommes-nous", href: "#qui-sommes-nous" },
-    { label: "Comment ça marche", href: "#comment-ca-marche" },
-    { label: "Simulation", href: "#simulation" },
-    { label: "FAQ", href: "#faq" },
+    { label: "Accueil", href: "/" },
+    { label: "Qui sommes-nous", href: "/#qui-sommes-nous" },
+    { label: "Comment ça marche", href: "/#comment-ca-marche" },
+    { label: "Simulation", href: "/#simulation" },
+    { label: "FAQ", href: "/#faq" },
 ];
 
 export default function HeaderSection() {
@@ -26,7 +27,7 @@ export default function HeaderSection() {
             {/* Content */}
             <nav className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 {/* Logo and Brand */}
-                <Link href="#accueil" className="flex items-center gap-2 group">
+                <Link href="/" className="flex items-center gap-2 group">
                     <div className="relative w-10 h-10">
                         <Image
                             src="/logo.png"
@@ -36,9 +37,10 @@ export default function HeaderSection() {
                             priority
                         />
                     </div>
-                    <h1 className="text-xl font-bold font-mono hidden sm:inline">
+                    {/* Le logo n'est pas le titre de la page : le seul h1 est celui du Hero. */}
+                    <span className="text-xl font-bold font-mono hidden sm:inline">
                         <span className="text-primary">Flash</span>Rend
-                    </h1>
+                    </span>
                 </Link>
 
                 {/* Desktop Navigation */}
@@ -97,12 +99,12 @@ export default function HeaderSection() {
                                             className="object-contain"
                                         />
                                     </div>
-                                    <h1 className="font-bold font-mono">
+                                    <span className="font-bold font-mono">
                                         <span className="text-primary">
                                             Flash
                                         </span>
                                         Rend
-                                    </h1>
+                                    </span>
                                 </div>
 
                                 {/* Mobile Navigation Links */}
