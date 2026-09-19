@@ -271,6 +271,9 @@ export default function RefundPage() {
                     <p className="font-semibold text-foreground">
                         📞 +33 (0)1 23 45 67 89
                     </p>
+                    <p className="font-semibold text-foreground">
+                        📞 +33 (0)6 51 94 15 46
+                    </p>
                 </CardContent>
             </Card>
         </div>

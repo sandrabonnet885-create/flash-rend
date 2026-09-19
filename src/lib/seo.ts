@@ -28,7 +28,13 @@ export const siteConfig = {
         "FlashRend",
     ],
     email: "contact@flashrend.site",
+    /** Numéro principal — conservé pour les usages qui n'en attendent qu'un seul. */
     phone: "+33123456789",
+    /** Tous les numéros affichés sur le site. `tel` = format E.164 pour les liens. */
+    phones: [
+        { label: "+33 (0)1 23 45 67 89", tel: "+33123456789" },
+        { label: "+33 (0)6 51 94 15 46", tel: "+33651941546" },
+    ],
     address: {
         street: "123 Avenue de la Crypto",
         postalCode: "75000",

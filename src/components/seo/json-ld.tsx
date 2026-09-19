@@ -36,7 +36,7 @@ export const organizationSchema = {
     image: absoluteUrl("/opengraph-image"),
     description: siteConfig.description,
     email: siteConfig.email,
-    telephone: siteConfig.phone,
+    telephone: siteConfig.phones.map((p) => p.tel),
     currenciesAccepted: "EUR",
     priceRange: "€€",
     address: {
@@ -50,16 +50,14 @@ export const organizationSchema = {
         "@type": "Country",
         name: "France",
     },
-    contactPoint: [
-        {
-            "@type": "ContactPoint",
-            contactType: "customer support",
-            email: siteConfig.email,
-            telephone: siteConfig.phone,
-            availableLanguage: ["French"],
-            areaServed: "FR",
-        },
-    ],
+    contactPoint: siteConfig.phones.map((p) => ({
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: siteConfig.email,
+        telephone: p.tel,
+        availableLanguage: ["French"],
+        areaServed: "FR",
+    })),
     sameAs: [`https://twitter.com/${siteConfig.twitter.replace("@", "")}`],
 };
 

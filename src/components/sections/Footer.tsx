@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { siteConfig } from "@/lib/seo";
 
 const footerLinks = {
     // Ancres préfixées par "/" : depuis /contact ou /legal elles renvoient bien
@@ -111,12 +112,17 @@ export default function FooterSection() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-1 text-amber-500 shrink-0" />
-                                <Link
-                                    href="tel:+33123456789"
-                                    className="text-foreground/60 hover:text-foreground transition-colors text-sm"
-                                >
-                                    +33 (0)1 23 45 67 89
-                                </Link>
+                                <div className="flex flex-col gap-1">
+                                    {siteConfig.phones.map((phone) => (
+                                        <Link
+                                            key={phone.tel}
+                                            href={`tel:${phone.tel}`}
+                                            className="text-foreground/60 hover:text-foreground transition-colors text-sm w-fit"
+                                        >
+                                            {phone.label}
+                                        </Link>
+                                    ))}
+                                </div>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-1 text-amber-500 shrink-0" />

@@ -16,6 +16,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { siteConfig } from "@/lib/seo";
 
 // Initialize EmailJS (replace with your public key)
 emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "");
@@ -24,20 +25,30 @@ const contactInfo = [
     {
         icon: Mail,
         title: "Email",
-        value: "contact@flashrend.site",
-        href: "mailto:contact@flashrend.site",
+        entries: [
+            {
+                value: siteConfig.email,
+                href: `mailto:${siteConfig.email}`,
+            },
+        ],
     },
     {
         icon: Phone,
         title: "Téléphone",
-        value: "+33 (0)1 23 45 67 89",
-        href: "tel:+33123456789",
+        entries: siteConfig.phones.map((p) => ({
+            value: p.label,
+            href: `tel:${p.tel}`,
+        })),
     },
     {
         icon: MapPin,
         title: "Adresse",
-        value: "123 Avenue de la Crypto, 75000 Paris, France",
-        href: "#",
+        entries: [
+            {
+                value: "123 Avenue de la Crypto, 75000 Paris, France",
+                href: "#",
+            },
+        ],
     },
 ];
 
@@ -138,12 +149,21 @@ export default function ContactSection() {
                                                 <h3 className="font-semibold mb-1">
                                                     {info.title}
                                                 </h3>
-                                                <a
-                                                    href={info.href}
-                                                    className="text-foreground/70 hover:text-foreground transition-colors text-sm"
-                                                >
-                                                    {info.value}
-                                                </a>
+                                                <div className="flex flex-col gap-1">
+                                                    {info.entries.map(
+                                                        (entry) => (
+                                                            <a
+                                                                key={entry.href}
+                                                                href={
+                                                                    entry.href
+                                                                }
+                                                                className="text-foreground/70 hover:text-foreground transition-colors text-sm w-fit"
+                                                            >
+                                                                {entry.value}
+                                                            </a>
+                                                        )
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </CardContent>

@@ -76,7 +76,7 @@ export default function LegalPage() {
                                 <strong>Email :</strong> <a href="mailto:contact@flashrend.site" className="text-amber-500 hover:text-amber-600">contact@flashrend.site</a>
                             </p>
                             <p className="text-foreground/70 leading-relaxed">
-                                <strong>Téléphone :</strong> +33 (0)1 23 45 67 89
+                                <strong>Téléphone :</strong> +33 (0)1 23 45 67 89 — +33 (0)6 51 94 15 46
                             </p>
                         </div>
                     </section>
@@ -230,7 +230,7 @@ export default function LegalPage() {
                         </p>
                         <p className="text-foreground/70 leading-relaxed mt-4">
                             <strong>Par email :</strong> <a href="mailto:legal@flashrend.site" className="text-amber-500 hover:text-amber-600">legal@flashrend.site</a><br />
-                            <strong>Par téléphone :</strong> +33 (0)1 23 45 67 89<br />
+                            <strong>Par téléphone :</strong> +33 (0)1 23 45 67 89 — +33 (0)6 51 94 15 46<br />
                             <strong>Par courrier :</strong> FlashRend SAS, 123 Avenue de la Crypto, 75000 Paris, France
                         </p>
                     </section>
