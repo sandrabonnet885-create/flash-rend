@@ -46,3 +46,6 @@ next-env.d.ts
 /prisma/migrations/
 /prisma/*.db
 /prisma/*.db-journal
+
+# rendu vidéo (images, mp4)
+/video/*/out/
