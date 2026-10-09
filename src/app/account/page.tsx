@@ -15,7 +15,7 @@ import {
     History,
 } from "lucide-react";
 import Link from "next/link";
-import { currentUser } from "@clerk/nextjs/server";
+import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { BonusClaimCard } from "@/components/bonus-claim-card";
@@ -27,6 +27,19 @@ export default async function AccountPage() {
 
     if (!user) {
         redirect("/sign-in");
+    }
+
+    // Première arrivée après l'inscription : on passe une seule fois par
+    // /account/bienvenue, la page qui sert d'objectif de conversion.
+    const isNewSignup =
+        !user.publicMetadata?.signupTracked &&
+        Date.now() - user.createdAt < 24 * 60 * 60 * 1000;
+    if (isNewSignup) {
+        const client = await clerkClient();
+        await client.users.updateUserMetadata(user.id, {
+            publicMetadata: { signupTracked: true },
+        });
+        redirect("/account/bienvenue");
     }
 
     let dbUser = await prisma.user.findUnique({
