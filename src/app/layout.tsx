@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { siteConfig } from "@/lib/seo";
 import {
@@ -136,6 +137,9 @@ export default function RootLayout({
                         <JsonLd data={websiteSchema} />
                         {children}
                         <TidioChat />
+                        <Script id="sitewit-analytics" strategy="afterInteractive">
+                            {`var _swaMa =["1037639316"];"undefined"==typeof sw&&!function(e, s, a){function t(){for(;o[0]&&"loaded"==o[0][d];)i=o.shift(),i[w]=!c.parentNode.insertBefore(i,c)}for(var r,n,i,o=[],c=e.scripts[0],w="onreadystatechange",d="readyState";r=a.shift();)n=e.createElement(s),"async"in c?(n.async=!1,e.head.appendChild(n)):c[d]?(o.push(n), n[w]=t): e.write("<" + s +' src="'+r+'" defer></'+s+">"),n.src=r}(document,"script",["//analytics.sitewit.com/v3/"+_swaMa[0]+"/sw.js"]);`}
+                        </Script>
                         <CookieConsent />
                         <Toaster />
                     </ThemeProvider>
